@@ -30,9 +30,9 @@
                     class="	glyphicon glyphicon-picture" style="color: black;margin-right: 5px;"></span>加载地图服务<span
                     class="pull-right glyphicon glyphicon-chevron-down"></span></a>
             <ul id="docCollapse10" class="nav nav-list collapse">
-                <li><a name="/one/indexBaidu.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-fire" style="color: black;margin-right: 5px;"></span>百度</a>
-                </li>
+                <li><a name="/one/indexTianDiTu.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>天地图</a></li>
                 <li><a name="/one/indexGaoDe.html" onclick=change(this.name) href="javascript:void(0)"><span
                             class="glyphicon glyphicon-heart" style="color: black;margin-right: 5px;"></span>高德</a>
                 </li>
@@ -45,16 +45,16 @@
                 <li><a name="/one/indexOSM.html" onclick=change(this.name) href="javascript:void(0)"><span
                             class="glyphicon glyphicon-facetime-video"
                             style="color: black;margin-right: 5px;"></span>OSM</a></li>
-                <li><a name="/one/indexTianDiTu.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-facetime-video"
-                            style="color: black;margin-right: 5px;"></span>天地图</a></li>
+                <li><a name="/one/indexBaidu.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-fire" style="color: black;margin-right: 5px;"></span>百度</a>
+                </li>
             </ul>
         </li>
         <li role="presentation" id="bar-1"><a name="map.html" onclick=change(this.name) href="javascript:void(0)"><span
                     class="	glyphicon glyphicon-globe" style="color: black;margin-right: 5px;"></span>加载地图服务</a></li>
     </ul>
     <div class="v-line"></div>
-    <iframe id="iframe" src="/one/indexBaidu.html" style="display:block;width: 88.05%;height: 87.5%;" frameborder="0"></iframe>
+    <iframe id="iframe" src="/one/indexTianDiTu.html" frameborder="0"></iframe>
 </body>
 <script>
     function change(url) {
@@ -76,6 +76,12 @@
         width: 0.15%;
         height: calc(100% - 76px);
         background: rgb(226, 240, 243);
+    }
+
+    #iframe {
+        display: block;
+        width: 88.05%;
+        height: calc(100% - 76px);
     }
 </style>
 

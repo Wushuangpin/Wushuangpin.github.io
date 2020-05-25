@@ -28,7 +28,6 @@
 </body>
 
 <script type="text/javascript">
-    alert("需手动点击图层管理器")
     var normalMap = L.tileLayer.chinaProvider('Baidu.Normal.Map', {
         maxZoom: 18,
         minZoom: 5
@@ -42,6 +41,9 @@
         minZoom: 5
     })
 
+    var normal = L.layerGroup([normalm]),
+        image = L.layerGroup([imgm, imga]);
+        
     var baseLayers = {
         "地图": normalMap,
         "影像": satelliteMap
@@ -60,7 +62,7 @@
         zoom: 12
     });
 
-    L.control.layers(baseLayers, overlayLayers).addTo(map);
+    L.control.layers(baseLayers, null).addTo(map);
     L.control.zoom({
         zoomInTitle: '放大',
         zoomOutTitle: '缩小'
