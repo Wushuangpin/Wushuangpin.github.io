@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>final Map</title>
+    <link rel="stylesheet" href="http://localhost:82/arcgis_js_api/library/3.20/3.20/esri/css/esri.css" />
+    <script src="http://localhost:82/arcgis_js_api/library/3.20/3.20/init.js"></script>
+    <script src="/js/data.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="/css/second.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+</body>
+
+<script>
+    require([
+        "esri/map",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Point",
+        "esri/SpatialReference",
+        "esri/symbols/PictureMarkerSymbol",
+        "esri/InfoTemplate",
+        "esri/graphic",
+    ], function (Map, GraphicsLayer, Point, SpatialReference, PictureMarkerSymbol, InfoTemplate, Graphic) {
+        //初始化地图
+        map = new Map("map", {
+            center: [119.39842, 26.004367],
+            zoom: 13,
+            basemap: "topo",
+            logo: false,
+        });
+
+        var lyGraphic = new GraphicsLayer()
+        map.addLayer(lyGraphic)
+
+        for (var i in users) {
+            point = new Point(users[i].xposition, users[i].yposition, map.SpatialReference)
+            picture = new PictureMarkerSymbol('/images/bifang.png', 15, 15)
+            info = new InfoTemplate('${name}', '<div class="div2"><div id="' + users[i].name + '" class="carousel slide" style="width: 200px;height: 130px;">' +
+                '<ol class="carousel-indicators" style="height: 0px">' +
+                '<li data-target="#' + users[i].name + '" data-slide-to="0" class="active"></li>' +
+                '<li data-target="#' + users[i].name + '" data-slide-to="1"></li>' +
+                '<li data-target="#' + users[i].name + '" data-slide-to="2"></li></ol><div class="carousel-inner" id="pic"><div class="item active">' +
+                '<img src=' + users[i].img1 + ' alt="First slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第一张</div></div><div class="item">' +
+                '<img src=' + users[i].img2 + ' alt="Second slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第二张</div></div><div class="item">' +
+                '<img src=' + users[i].img3 + ' alt="Third slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第三张</div></div></div>' +
+                '<a class="left carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="prev">' +
+                '<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>' +
+                '<span class="sr-only">Previous</span></a>' +
+                '<a class="right carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="next">' +
+                '<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>' +
+                '<span class="sr-only">Next</span>' +
+                '</a><div style="background-color: aliceblue;margin-top: 15px;border-radius: 10px;">' +
+                '<div class="p1"><a >' + users[i].name + '</a></div><div class="p2">' +
+                '<span class="p">地址：' + users[i].address + '</span><br>' +
+                '<span class="p">类别：' + users[i].type + '</span><br>' +
+                '<span class="p">保护等级：' + users[i].grade + '</span><br>' +
+                '<span class="p">所在地：' + users[i].located + '</span><br>' +
+                '<span class="p">建造年代：' + users[i].buildtime + '</span><br>' +
+                '<a id="button2" type="button" class="btn btn-primary" onclick= swal("' + users[i].name + '","' + users[i].xiangxi + '")>详情</a>' +
+                '</div></div></div></div>')
+            attribute = { name: users[i].name, content: users[i].xiangxi }
+            graphic = new Graphic(point, picture, attribute, info)
+            lyGraphic.add(graphic)
+        }
+        lyGraphic.on("click", function (evt) {
+            console.log(evt)
+            //map.centerAt(evt.mapPoint)
+        });
+    })
+</script>
+
+</html>

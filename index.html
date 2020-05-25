@@ -1,16 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GitHub</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>福州市古厝文化信息检索与展示系统</title>
+    <link rel="icon" type="image/x-icon" href="/images/title.ico" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>welcome to my github </h1>
-    <h2>Working....</h2>
-    <h2>464545913@qq.com</h2>
+    <iframe src="navbar.html" style="display:block;width: 100%;height:70px;" frameborder="0"></iframe>
+    <hr style="margin-top: 2px;margin-bottom: 2px;border-top: 2px solid rgb(226, 240, 243);">
+    <ul class="nav nav-pills nav-stacked sidebar">
+        <li role="presentation" id="bar-10">
+            <a href="#docCollapse10" class="nav-header collapsed" data-toggle="collapse" id="collapseParent"><span
+                    class="	glyphicon glyphicon-picture" style="color: black;margin-right: 5px;"></span>加载地图服务<span
+                    class="pull-right glyphicon glyphicon-chevron-down"></span></a>
+            <ul id="docCollapse10" class="nav nav-list collapse">
+                <li><a name="/one/indexBaidu.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-fire" style="color: black;margin-right: 5px;"></span>百度</a>
+                </li>
+                <li><a name="/one/indexGaoDe.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-heart" style="color: black;margin-right: 5px;"></span>高德</a>
+                </li>
+                <li><a name="/one/indexGeoq.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>智图</a></li>
+                <li><a name="/one/indexGoogle.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>谷歌</a></li>
+                <li><a name="/one/indexOSM.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>OSM</a></li>
+                <li><a name="/one/indexTianDiTu.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>天地图</a></li>
+            </ul>
+        </li>
+        <li role="presentation" id="bar-1"><a name="map.html" onclick=change(this.name) href="javascript:void(0)"><span
+                    class="	glyphicon glyphicon-globe" style="color: black;margin-right: 5px;"></span>加载地图服务</a></li>
+    </ul>
+    <div class="v-line"></div>
+    <iframe id="iframe" src="/one/indexBaidu.html" style="display:block;width: 88.05%;height: 87.5%;" frameborder="0"></iframe>
 </body>
+<script>
+    function change(url) {
+        document.getElementById("iframe").src = url
+    }
+</script>
+<style>
+    .sidebar {
+        background: rgb(226, 240, 243);
+        width: 11.5%;
+        height: calc(100% - 76px);
+        float: left;
+    }
+
+    .v-line {
+        float: left;
+        margin-left: 0.15%;
+        margin-right: 0.15%;
+        width: 0.15%;
+        height: calc(100% - 76px);
+        background: rgb(226, 240, 243);
+    }
+</style>
 
 </html>

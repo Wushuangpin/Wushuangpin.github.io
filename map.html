@@ -1,193 +1,414 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-    <title>Landuse</title>
-
-    <link rel="stylesheet" href="https://js.arcgis.com/3.32/dijit/themes/claro/claro.css">
-    <link rel="stylesheet" href="https://js.arcgis.com/3.32/esri/css/esri.css">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+    <title>final Map</title>
+    <script src="/js/data.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/sweetalert.css">
+    <link href="/css/second.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="/js/sweetalert-dev.js"></script>
+    <link rel="stylesheet" href="http://localhost:82/arcgis_js_api/library/3.20/3.20/esri/css/esri.css" />
+    <script src="http://localhost:82/arcgis_js_api/library/3.20/3.20/init.js"></script>
     <style>
-      html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        overflow:hidden;
-      }
-      #header {
-        border:solid 2px #462d44;
-        background:#fff;
-        color:#444;
-        -moz-border-radius: 4px;
-        border-radius: 4px;
-        font-family: sans-serif;
-        font-size: 1.1em;
-        padding-left:20px;
-      }
-      #map {
-        padding:1px;
-        border:solid 2px #444;
-        -moz-border-radius: 4px;
-        border-radius: 4px;
-      }
-      #rightPane {
-        border:none;
-        padding: 0;
-        width:228px;
-      }
-      .templatePicker {
-        border: solid 2px #444;
-      }
-    </style>
-
-    <script src="https://js.arcgis.com/3.32/"></script>
-    <script>
-      var map;
-      require([
-        "esri/map",
-        "esri/toolbars/draw",
-        "esri/toolbars/edit",
-        "esri/graphic",
-        "esri/config",
-
-        "esri/layers/FeatureLayer",
-
-        "esri/symbols/SimpleMarkerSymbol",
-        "esri/symbols/SimpleLineSymbol",
-        "esri/symbols/SimpleFillSymbol",
-
-        "esri/dijit/editing/TemplatePicker",
-
-        "dojo/_base/array",
-        "dojo/_base/event",
-        "dojo/_base/lang",
-        "dojo/parser",
-        "dijit/registry",
-
-        "dijit/layout/BorderContainer", "dijit/layout/ContentPane",
-        "dijit/form/Button", "dojo/domReady!"
-      ], function(
-        Map, Draw, Edit, Graphic, esriConfig,
-        FeatureLayer,
-        SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol,
-        TemplatePicker,
-        arrayUtils, event, lang, parser, registry
-      ) {
-        parser.parse();
-
-        // refer to "Using the Proxy Page" for more information:  https://developers.arcgis.com/javascript/3/jshelp/ags_proxy.html
-        esriConfig.defaults.io.proxyUrl = "/proxy/";
-
-        // This service is for development and testing purposes only. We recommend that you create your own geometry service for use within your applications.
-        esriConfig.defaults.geometryService = new esri.tasks.GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
-
-        map = new Map("map");
-        map.on("layers-add-result", initEditing);
-
-        var landusePointLayer = new FeatureLayer("https://localhost:6443/arcgis/rest/services/My/feature/FeatureServer/0", {
-          mode: FeatureLayer.MODE_SNAPSHOT,
-          outFields: ["*"]
-        });
-        var landuseLineLayer = new FeatureLayer("https://localhost:6443/arcgis/rest/services/My/feature/FeatureServer/1", {
-          mode: FeatureLayer.MODE_SNAPSHOT,
-          outFields: ["*"]
-        });
-        var landusePolygonLayer = new FeatureLayer("https://localhost:6443/arcgis/rest/services/My/feature/FeatureServer/2", {
-          mode: FeatureLayer.MODE_SNAPSHOT,
-          outFields: ["*"]
-        });
-
-        map.addLayers([landusePointLayer, landuseLineLayer, landusePolygonLayer]);
-
-        function initEditing(evt) {
-          console.log("initEditing", evt);
-          // var map = this;
-          var currentLayer = null;
-          var layers = arrayUtils.map(evt.layers, function(result) {
-            return result.layer;
-          });
-          console.log("layers", layers);
-
-          var editToolbar = new Edit(map);
-          editToolbar.on("deactivate", function(evt) {
-            currentLayer.applyEdits(null, [evt.graphic], null);
-          });
-
-          arrayUtils.forEach(layers, function(layer) {
-            var editingEnabled = false;
-            layer.on("dbl-click", function(evt) {
-              event.stop(evt);
-              if (editingEnabled === false) {
-                editingEnabled = true;
-                editToolbar.activate(Edit.EDIT_VERTICES , evt.graphic);
-              } else {
-                currentLayer = this;
-                editToolbar.deactivate();
-                editingEnabled = false;
-              }
-            });
-
-            layer.on("click", function(evt) {
-              event.stop(evt);
-              if (evt.ctrlKey === true || evt.metaKey === true) {  //delete feature if ctrl key is depressed
-                layer.applyEdits(null,null,[evt.graphic]);
-                currentLayer = this;
-                editToolbar.deactivate();
-                editingEnabled=false;
-              }
-            });
-          });
-
-          var templatePicker = new TemplatePicker({
-            featureLayers: layers,
-            rows: "auto",
-            columns: 2,
-            grouping: true,
-            style: "height: auto; overflow: auto;"
-          }, "templatePickerDiv");
-
-          templatePicker.startup();
-
-          var drawToolbar = new Draw(map);
-
-          var selectedTemplate;
-          templatePicker.on("selection-change", function() {
-            if( templatePicker.getSelected() ) {
-              selectedTemplate = templatePicker.getSelected();
-            }
-            switch (selectedTemplate.featureLayer.geometryType) {
-              case "esriGeometryPoint":
-                drawToolbar.activate(Draw.POINT);
-                break;
-              case "esriGeometryPolyline":
-                drawToolbar.activate(Draw.POLYLINE);
-                break;
-              case "esriGeometryPolygon":
-                drawToolbar.activate(Draw.POLYGON);
-                break;
-            }
-          });
-
-          drawToolbar.on("draw-end", function(evt) {
-            drawToolbar.deactivate();
-            editToolbar.deactivate();
-            var newAttributes = lang.mixin({}, selectedTemplate.template.prototype.attributes);
-            var newGraphic = new Graphic(evt.geometry, null, newAttributes);
-            selectedTemplate.featureLayer.applyEdits([newGraphic], null, null);
-          });
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
-      });
-    </script>
-  </head>
-  <body class="claro">
-    <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, design:'headline'" style="width:100%;height:100%;">
-      <div data-dojo-type="dijit/layout/ContentPane"  id="header" data-dojo-props="region:'top'">Use ctrl or cmd + click on graphic to delete.  Double click on graphic to edit vertices. </div>
-      <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
-      <div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
-        <div id="templatePickerDiv"></div>
-      </div>
+
+        #scalebar {
+            position: absolute;
+            right: 37%;
+            bottom: 4%;
+            z-index: 50;
+        }
+
+        #HomeButton {
+            position: absolute;
+            left: 20px;
+            top: 93px;
+            z-index: 50;
+        }
+
+        #LocateButton {
+            left: 20px;
+            position: absolute;
+            top: 130px;
+            z-index: 50;
+        }
+
+        #BasemapToggle {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            z-index: 50;
+        }
+
+        #search {
+            display: block;
+            position: absolute;
+            top: 25px;
+            left: 75px;
+            z-index: 50;
+        }
+
+        #info1 {
+            position: absolute;
+            left: 0.5%;
+            bottom: 4%;
+            color: #000;
+            z-index: 50;
+        }
+
+        #info2 {
+            position: absolute;
+            left: 0.5%;
+            bottom: 0.5%;
+            color: #000;
+            z-index: 50;
+        }
+
+        #measuretool {
+            position: absolute;
+            left: 33%;
+            top: 4.3%;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map">
+        <div id="scalebar"></div>
+        <div id="HomeButton"></div>
+        <div id="LocateButton"></div>
+        <div id="BasemapToggle"></div>
+        <div id="search"></div>
+        <span id="info1"></span>
+        <span id="info2"></span>
     </div>
-  </body>
+    <div id="measuretool" class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="width:96px"
+            onclick=display()>测量工具<span class="caret"></span>
+        </button>
+        <ul id="ul" class="dropdown-menu" role="menu" style="min-width:10px;">
+            <li><a href="javascript:void(0)" id="line">距离测量</a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:void(0)" id="type" title="<a>几何类型</a>" data-container="body" data-toggle="popover"
+                    data-content="<a onclick=rectangle() href='javascript:void(0)'>矩形</a><br><a onclick=circle() href='javascript:void(0)'>圆形</a><br><a onclick=ellipse() href='javascript:void(0)'>椭圆形</a><br><a onclick=polygon() href='javascript:void(0)'>多边形</a>">
+                    面积测量
+                </a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:void(0)" id="clear">清除覆盖</a></li>
+        </ul>
+    </div>
+</body>
+
+<script>
+    var map, mapCenter, selectionToolbar, featureLayer;
+    var visible = [], setLayerVisibility;
+    var toolbar, geometryService;
+    require([
+        "esri/basemaps",
+        "esri/map",
+        "esri/config",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "esri/layers/FeatureLayer",
+        "esri/layers/GraphicsLayer",
+        "esri/geometry/Point",
+        "esri/symbols/PictureMarkerSymbol",
+        "esri/InfoTemplate",
+        "esri/symbols/SimpleFillSymbol",
+        "esri/symbols/SimpleLineSymbol",
+        "esri/symbols/SimpleMarkerSymbol",
+        "esri/tasks/query",
+        "esri/toolbars/draw",
+
+        "esri/graphic",
+        "esri/dijit/Scalebar",
+        "esri/dijit/HomeButton",
+        "esri/dijit/LocateButton",
+        "esri/dijit/BasemapToggle",
+        "esri/dijit/OverviewMap",
+        "esri/dijit/Search",
+        "esri/geometry/webMercatorUtils",
+
+        "dojo/dom",
+        "dojo/on",
+        "dojo/_base/Color",
+        "dojox/charting/Chart2D",
+        "dojo/domReady!",
+        "esri/geometry/Extent",
+        "esri/SpatialReference",
+        "esri/tasks/LengthsParameters", "esri/tasks/AreasAndLengthsParameters"],
+        function (
+            esriBasemaps,
+            Map,
+            esriConfig,
+            ArcGISDynamicMapServiceLayer,
+            FeatureLayer,
+            GraphicsLayer,
+            Point,
+            PictureMarkerSymbol,
+            InfoTemplate,
+            SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,
+            Query,
+            Draw,
+            Graphic,
+            Scalebar,
+            HomeButton,
+            LocateButton,
+            BasemapToggle,
+            OverviewMap,
+            Search,
+            webMercatorUtils,
+            dom,
+            on,
+            Color,
+            Chart2D,
+            domConstruct, Extent, SpatialReference, LengthsParameters, AreasAndLengthsParameters) {
+
+
+            //初始化地图
+            map = new esri.Map("map", {
+                center: [119.39842, 26.004367],
+                zoom: 13,
+                basemap: "topo",
+                logo: false,
+            });
+            //卫星底图
+            var toggle = new BasemapToggle({
+                map: map,
+                basemap: "satellite"
+            }, "BasemapToggle");
+            toggle.startup();
+
+            //返回主视图
+            var home = new HomeButton({
+                map: map
+            }, "HomeButton");
+            home.startup();
+
+            //定位
+            var geoLocate = new LocateButton({
+                map: map
+            }, "LocateButton");
+            geoLocate.startup();
+
+            //鹰眼
+            var overviewMapDijit = new OverviewMap({
+                map: map,
+                attachTo: "bottom-right",
+                visible: true
+            });
+            overviewMapDijit.startup();
+
+            //比例尺
+            var scalebar = new Scalebar({
+                map: map,//地图对象
+                scalebarStyle: "ruler",//line 比例尺样式类型
+                scalebarUnit: "metric"//显示地图的单位，这里是km
+            }, dojo.byId("scalebar"));
+
+            //搜索
+            var search = new Search({
+                map: map
+            }, "search");
+            search.startup();
+
+            map.on("load", function () {
+                //map.on("click", xxx);
+                map.disableDoubleClickZoom();//鼠标双击缩放
+                map.on("mouse-move", mapPoint);
+                map.on("extent-change", mapCenter);
+                dom.byId("info1").innerHTML = "指针经度：119.3980丨指针纬度：26.0040丨放大层级：13";//显示地图坐标
+                dom.byId("info2").innerHTML = "中心经度：119.3980丨中心纬度：26.0040";//显示地图坐标
+            });
+            function mapPoint(evt) {
+                var mp = webMercatorUtils.webMercatorToGeographic(evt.mapPoint);
+                dom.byId("info1").innerHTML = "指针经度：" + mp.x.toFixed(4) + "丨" + "指针纬度：" + mp.y.toFixed(4) + "丨" + "放大层级：" + map.getLevel();
+            }
+            function mapCenter(evt) {
+                var center = map.extent.getCenter()
+                var mp = webMercatorUtils.webMercatorToGeographic(center);
+                dom.byId("info2").innerHTML = "中心经度：" + mp.x.toFixed(4) + "丨" + "中心纬度：" + mp.y.toFixed(4);
+            }
+
+            var lyGraphic = new GraphicsLayer()
+            map.addLayer(lyGraphic)
+
+            for (var i in users) {
+                point = new Point(users[i].xposition, users[i].yposition, map.SpatialReference)
+                picture = new PictureMarkerSymbol('/images/bifang.png', 15, 15)
+                info = new InfoTemplate('${name}', '<div class="div2"><div id="' + users[i].name + '" class="carousel slide" style="width: 200px;height: 130px;">' +
+                    '<ol class="carousel-indicators" style="height: 0px">' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="0" class="active"></li>' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="1"></li>' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="2"></li></ol><div class="carousel-inner" id="pic"><div class="item active">' +
+                    '<img src=' + users[i].img1 + ' alt="First slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第一张</div></div><div class="item">' +
+                    '<img src=' + users[i].img2 + ' alt="Second slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第二张</div></div><div class="item">' +
+                    '<img src=' + users[i].img3 + ' alt="Third slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第三张</div></div></div>' +
+                    '<a class="left carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="prev">' +
+                    '<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>' +
+                    '<span class="sr-only">Previous</span></a>' +
+                    '<a class="right carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="next">' +
+                    '<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>' +
+                    '<span class="sr-only">Next</span>' +
+                    '</a><div style="background-color: aliceblue;margin-top: 15px;border-radius: 10px;">' +
+                    '<div class="p1"><a >' + users[i].name + '</a></div><div class="p2">' +
+                    '<span class="p">地址：' + users[i].address + '</span><br>' +
+                    '<span class="p">类别：' + users[i].type + '</span><br>' +
+                    '<span class="p">保护等级：' + users[i].grade + '</span><br>' +
+                    '<span class="p">所在地：' + users[i].located + '</span><br>' +
+                    '<span class="p">建造年代：' + users[i].buildtime + '</span><br>' +
+                    '<a id="button2" type="button" class="btn btn-info" onclick= swal("' + users[i].name + '","' + users[i].xiangxi + '")>详情</a>' +
+                    '</div></div></div></div>')
+                attribute = { name: users[i].name, content: users[i].xiangxi }
+                graphic = new Graphic(point, picture, attribute, info)
+                lyGraphic.add(graphic)
+            }
+
+            lyGraphic.on("mouse-move", function (evt) {
+                evt.currentTarget.style.cursor = "hand"
+            });
+
+            lyGraphic.on("dbl-click", function (evt) {
+                map.centerAt(evt.mapPoint)
+            });
+
+            measurelayer = new GraphicsLayer();
+            map.addLayer(measurelayer);
+            toolbar = new Draw(map)
+            toolbar.on("draw-complete", drawcomplete);
+            function drawcomplete(evt) {
+                measuregeometry = evt.geometry;
+                toolbar.deactivate();
+                if (evt.geometry.type == 'polyline') {
+                    var measuresymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color("black"), 2)
+                }
+                if (evt.geometry.type == 'polygon') {
+                    var measuresymbol = new SimpleFillSymbol(
+                        SimpleFillSymbol.STYLE_SOLID,
+                        new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2),
+                        new Color([255, 255, 0, 0.25])
+                    );
+                }
+                var newGraphic = new Graphic(evt.geometry, measuresymbol)
+                measurelayer.clear();
+                measurelayer.add(newGraphic);
+                MeasureGeometry(evt.geometry);
+            }
+            geometryService = new esri.tasks.GeometryService("http://localhost:6080/arcgis/rest/services/Utilities/Geometry/GeometryServer");
+
+            function MeasureGeometry(geometry) {
+                //如果为线类型就进行lengths距离测算 
+                if (geometry.type == "polyline") {
+                    var lengthParams = new esri.tasks.LengthsParameters();
+                    lengthParams.polylines = [geometry];
+                    lengthParams.lengthUnit = esri.tasks.GeometryService.UNIT_METER;
+                    lengthParams.geodesic = true;
+                    lengthParams.polylines[0].spatialReference = new esri.SpatialReference(3857);
+                    geometryService.lengths(lengthParams);
+                    dojo.connect(geometryService, "onLengthsComplete", outputDistance);
+                }
+                //如果为面类型需要先进行simplify操作在进行面积测算 
+                else if (geometry.type == "polygon") {
+                    var areasAndLengthParams = new esri.tasks.AreasAndLengthsParameters();
+                    areasAndLengthParams.lengthUnit = esri.tasks.GeometryService.UNIT_METER;
+                    areasAndLengthParams.areaUnit = esri.tasks.GeometryService.UNIT_SQUARE_METERS;
+                    this.outSR = new esri.SpatialReference({ wkid: 3857 });
+                    geometryService.project([geometry], this.outSR, function (geometry) {
+                        geometryService.simplify(geometry, function (simplifiedGeometries) {
+                            areasAndLengthParams.polygons = simplifiedGeometries;
+                            areasAndLengthParams.polygons[0].spatialReference = new esri.SpatialReference(102113);
+                            geometryService.areasAndLengths(areasAndLengthParams);
+                        });
+                    });
+                    dojo.connect(geometryService, "onAreasAndLengthsComplete", outputAreaAndLength);
+                }
+            }
+            //显示测量距离 
+            function outputDistance(result) {
+                var CurX = measuregeometry.paths[0][measuregeometry.paths[0].length - 1][0];
+                var CurY = measuregeometry.paths[0][measuregeometry.paths[0].length - 1][1];
+                var CurPos = new esri.geometry.Point(CurX, CurY, map.spatialReference);
+                map.infoWindow.setTitle("距离测量");
+                map.infoWindow.setContent(" 测量长度 ： <strong>" + parseInt(String(result.lengths[0])) + "米</strong>");
+                map.infoWindow.show(CurPos);
+            }
+
+            //显示测量面积 
+            function outputAreaAndLength(result) {
+                var CurX = (measuregeometry.cache._extent.xmax + measuregeometry.cache._extent.xmin) / 2;
+                var CurY = (measuregeometry.cache._extent.ymax + measuregeometry.cache._extent.ymin) / 2
+                var CurPos = new esri.geometry.Point(CurX, CurY, map.spatialReference);
+                map.infoWindow.setTitle("面积测量");
+                map.infoWindow.setContent(" 面积：<strong>" + parseInt(String(result.areas[0])) + "平方米</strong><br>周长：<strong>" + parseInt(String(result.lengths[0])) + "米</strong>");
+                map.infoWindow.show(CurPos);
+                //alert("面积：" + dojo.number.format(result.areas[0]) + "平方米" + " 长度：" + dojo.number.format(result.lengths[0]) + "米"); 
+            }
+
+            $(function () {
+                $("#type").popover({ html: true });
+            });
+
+            display = function () {
+                $("#ul").slideToggle()
+                document.getElementById("type").click()
+                if (i == 1) {
+                    document.getElementById("type").click()
+                }
+                if ($("[class='popover fade right in']").length > 0) {
+                    document.getElementById("type").click()
+                }
+            }
+            rectangle = function () {
+                toolbar.activate(Draw.RECTANGLE);
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+            }
+            circle = function () {
+                toolbar.activate(Draw.CIRCLE);
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+            }
+            polygon = function () {
+                toolbar.activate(Draw.POLYGON);
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+            }
+            ellipse = function () {
+                toolbar.activate(Draw.ELLIPSE);
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+            }
+            dojo.connect(dojo.byId("line"), "click", function () {
+                toolbar.activate(Draw.POLYLINE);
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+            })
+            dojo.connect(dojo.byId("clear"), "click", function () {
+                measurelayer.clear();
+                $("#ul").slideToggle()
+                $("[class='popover fade right in']").remove()
+                i = 1
+                map.infoWindow.hide();
+            })
+        })
+</script>
+
 </html>

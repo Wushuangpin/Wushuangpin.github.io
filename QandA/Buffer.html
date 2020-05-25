@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>缓冲区分析</title>
+    <link rel="stylesheet" href="http://localhost:82/arcgis_js_api/library/3.20/3.20/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" href="http://localhost:82/arcgis_js_api/library/3.20/3.20/esri/css/esri.css" />
+    <script src="http://localhost:82/arcgis_js_api/library/3.20/3.20/init.js"></script>
+    <style type="text/css">
+        html {
+            width: 100%;
+            height: 95%;
+            padding: 0;
+            margin: 0;
+        }
+
+        body,
+        .MapClass {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .DivClass {
+            margin-left: 100px;
+            margin-top: 10px;
+        }
+    </style>
+    <script type="text/javascript">
+        require(["esri/map",
+            "esri/geometry/Extent",
+            "esri/SpatialReference",
+            "esri/geometry/Point",
+            "dojo/dom", "dojo/on",
+            "esri/layers/ArcGISDynamicMapServiceLayer",
+            "esri/symbols/SimpleMarkerSymbol",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/symbols/SimpleFillSymbol",
+            "esri/toolbars/draw",
+            "esri/graphic",
+            "esri/tasks/GeometryService",
+            "esri/tasks/BufferParameters",
+            "dojo/colors",
+            "dojo/domReady!"], funBuffer);
+        function funBuffer(Map, Extent, SpatialReference, Point, dom, on, ArcGISDynamicMapServiceLayer, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, Draw, Graphic, GeometryService, BufferParameters, Color) {
+            //添加动态地图服务图层
+            map = new Map("mapDiv", {
+                center: [119.36842, 26.054367],
+                zoom: 14,
+                basemap: "topo",
+                logo: false,
+            });
+            //创建几何服务对象
+            var geometryServices = new GeometryService("http://localhost:6080/arcgis/rest/services/Utilities/Geometry/GeometryServer");
+            //创建缓存参数对象
+            var params = new BufferParameters();
+            //创建toolbar绘图工具
+            var toolBar = new Draw(map);
+            //创建点符号
+            var pointSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 12, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 255]), 2), new Color("red"));
+            //创建线符号
+            var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 255]), 3);
+            //创建面符号
+            var polygonSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 0, 255]), 3), new Color([0, 255, 0, 0.6]));
+            var bufferSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color([255, 0, 0]), 3), new Color([0, 255, 255, 0.4]));
+            //给按钮绑定click事件，用来绘制点、线、面
+            on(dom.byId("btnPoint"), "click", funDrawPoint);
+            function funDrawPoint() {
+                toolBar.activate(Draw.POINT, { showTooltips: true });
+            }
+            on(dom.byId("btnLine"), "click", funDrawLine);
+            function funDrawLine() {
+                toolBar.activate(Draw.POLYLINE, { showTooltips: true });
+            }
+            on(dom.byId("btnPolygon"), "click", funDrawPolygon);
+            function funDrawPolygon() {
+                toolBar.activate(Draw.POLYGON, { showTooltips: true });
+            }
+            //绘图结束绑定事件
+            on(toolBar, "draw-end", funDrawEnd);
+            function funDrawEnd(result) {
+                //获得绘制的形状
+                console.log(result)
+                var geometry = result.geometry;
+                //创建Graphic
+                var graphic;
+                //根据graphic类型设置符号
+                if (geometry.type == "point") {
+                    graphic = new Graphic(geometry, pointSymbol);
+                }
+                else if (geometry.type == "polyline") {
+                    graphic = new Graphic(geometry, lineSymbol);
+                }
+                else if (geometry.type == "polygon") {
+                    graphic = new Graphic(geometry, polygonSymbol);
+                }
+                //添加绘制的图形到地图
+                map.graphics.add(graphic);
+                //关闭绘图工具
+                toolBar.deactivate();
+                //构建缓冲区分析的形状属性
+                params.geometries = [geometry];
+                //构建缓冲距离
+                params.distances = ["1000", "2000"];
+                //空间参考
+                params.bufferSpatialReference = map.spatialReference;
+                params.outSpatialReference = map.spatialReference;
+                //执行缓冲区分析
+                geometryServices.buffer(params, funResult);
+                //处理缓冲区分析得到的结果
+                function funResult(result) {
+                    //将每一个缓冲结果添加到地图
+                    for (var i = 0; i < result.length; i++) {
+                        var graphic = new Graphic(result[i], bufferSymbol)
+                        map.graphics.add(graphic)
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="DivClass">
+        <input id="btnPoint" type="button" value="点缓冲区" />
+        <input id="btnLine" type="button" value="线缓冲区" />
+        <input id="btnPolygon" type="button" value="面缓冲区" />
+    </div>
+    <div id="mapDiv" class="MapClass"></div>
+</body>
+
+</html>

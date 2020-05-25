@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>福州市古厝文化信息检索与展示系统</title>
+    <link rel="icon" type="image/x-icon" href="/images/title.ico" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="/css/second.css" rel="stylesheet" type="text/css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/sweetalert.css">
+    <script type="text/javascript" src="/js/sweetalert-dev.js"></script>
+    <script type="text/javascript"
+        src="http://api.map.baidu.com/api?v=2.0&ak=2GVVoVth63ABPvY68rX4dek93chHmGjT"></script>
+    <style>
+        .pano_pc_indoor_exit {
+            display: none
+        }
+
+        .img_content {
+            z-index: 1901;
+            display: none;
+            position: absolute;
+            top: 20vh;
+            left: 50%;
+            /* margin: 5% 0 0 25%; */
+            background-color: white;
+            overflow: auto;
+            height: auto;
+            width: auto;
+            box-shadow: 10px 10px 6px #888888;
+            border: 10px solid white;
+            border-radius: 15px
+        }
+
+        .colse_btn {
+            border: solid 1px #3488db;
+            color: white;
+            margin: 5px 10px 0 0;
+            height: 30px;
+            line-height: 30px;
+            width: 60px;
+            background: #3488db;
+            border-radius: .5em;
+            display: inline-block;
+            outline: none;
+            cursor: pointer;
+            text-align: center;
+            float: right;
+        }
+
+        div.xx {
+            z-index: 1901;
+            display: none;
+            position: absolute;
+            left: 10vw;
+            top: 135px;
+            border-radius: 5px;
+            overflow: hidden;
+            width: 250px;
+        }
+
+        div.xx h5 {
+            font-size: 18px;
+            margin: 0;
+            line-height: 30px;
+            background: #eee;
+            padding: 3px;
+            vertical-align: middle;
+        }
+
+        .s1 {
+            color: gray;
+            text-decoration: none;
+        }
+
+        .s2 {
+            display: none;
+            margin-block-start: 0em;
+            margin-block-end: 0em;
+            color: #939799;
+            font-size: 12px;
+            text-align: justify;
+            text-indent: 2em;
+            padding: 0.5rem;
+            background: rgba(37, 37, 37, .9);
+            filter: alpha(Opacity=100);
+            -moz-opacity: 1;
+            opacity: 1;
+        }
+
+        #s1:hover {
+            color: #33aaff;
+            ;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="LWZGC" class="xx">
+        <h5 class="btn1"><span class="glyphicon glyphicon-user"></span>
+            <a class="s1" href="javascript:void(0)">林则徐纪念馆</a><span class="glyphicon glyphicon-list"
+                style="float: right;padding: 0.5rem;"></span>
+        </h5>
+        <p class="s2">林则徐纪念馆建于清光绪三十一年，位于在鼓楼区澳门路，就在三坊七巷附近，过去很方便。
+            进入林则徐纪念馆，屏墙左右两边的石拱门上，横额分别为“中兴宗衮”及“左海伟人”。祠门外围屏墙内壁有浮雕虎门销烟图，大门上额刻着“林文忠公祠”，仪门两侧回廊陈列了20多面执事牌。
+            仪门厅后有石道可以直达御碑亭，内有光绪三十一年立的道光三十年“圣旨”、“御赐祭”、“御制碑文”等3块青石碑。御碑亭的北边为树德堂，里面有林则徐坐像。树德堂的西面为南北花厅，厅的西面有两层的曲尺楼，原为林家子弟读书的地方，楼前有草坪、鱼池、假山、花木等。
+            全馆为古典式园林建筑，现如今，堂、厅、楼均辟为林则徐生平展室，分林则徐生平事略、林则徐与鸦片战争、林则徐与救灾、水利，放眼看世界第一人、林则徐手迹等部分。2018年10月，命名为2018年“全国中小学生研学实践教育基地”。
+        </p>
+    </div>
+    <div id="ZZC" class="xx">
+        <h5 class="btn1"><span class="glyphicon glyphicon-user"></span>
+            <a class="s1" href="javascript:void(0)">昭忠祠</a><span class="glyphicon glyphicon-list"
+                style="float: right;padding: 0.5rem;"></span>
+        </h5>
+        <p class="s2">
+            昭忠祠是中法战争马江战役196位烈士埋骨处，位于福建省福州市马尾马限山东南麓。清光绪十年（公元1884年）农历七月初三，法国远东舰队闯入马尾港，企图侵占福州。福建水师仓促应战，死难水陆官兵达千余人。部分烈士遗体安葬在马限山麓沙滩上，并立碑纪念。昭忠祠正厅置烈士姓名、职务的碑石，两边回廊分立昭忠祠碑和记叙烈士战绩的碑刻。厅中陈列有马尾港地形沙盘，西厢及廊庑陈列大炮、炮弹及烈士遗物、遗嘱等。祠西有墓台，台高约1米，环台三面各设一座五层台阶，台正中有一座圆顶雕花四柱的石碑亭。昭忠祠后山岩壁有“仰止”、“铁石同心”等等崖题刻。墓西有一登山石道，拾级而上，便是马限山炮台遗址、原英国福州领事馆分馆遗址和英国梅园监狱遗址等古迹。
+        </p>
+    </div>
+    <div id="FZKYS" class="xx">
+        <h5 class="btn1"><span class="glyphicon glyphicon-user"></span>
+            <a class="s1" href="javascript:void(0)">福州开元寺</a><span class="glyphicon glyphicon-list"
+                style="float: right;padding: 0.5rem;"></span>
+        </h5>
+        <p class="s2">
+            开元寺，位于福州城内经院巷的开元寺，始建于梁太清二年(548年)，是福州现存最古老的佛寺，初建时名大云寺，开元寺，唐开元二十六年(738年)改名开元，寺门口的开元寺牌匾，据说是1000多年前的唐代大书法家欧阳询所书。
+        </p>
+    </div>
+    <div id="QGC" class="xx">
+        <h5 class="btn1"><span class="glyphicon glyphicon-user"></span>
+            <a class="s1" href="javascript:void(0)">戚公祠</a><span class="glyphicon glyphicon-list"
+                style="float: right;padding: 0.5rem;"></span>
+        </h5>
+        <p class="s2">
+            戚公祠位于福州于山白塔寺东，在补山精舍之侧，为祭祀抗倭名将戚继光而设。现祠是1918年重建，横立在五老岗上。戚继光于嘉靖四十一年（1562年）率兵支援福建抗倭，在宁德横屿、福清牛田、莆田林墩打了三次大胜仗，给倭寇以沉重的打击。班师回浙江时，福州官绅在于山平远台设宴接风，勒碑纪其功。后人在此建戚公祠，后废。祠厅周围有平远台、醉石亭、蓬莱阁、补山精舍、吸翠亭等诸多名胜，岗峦起伏，花木扶疏，曲径通幽，颇具园林雅韵。祠厅系硬山顶土木结构建筑，内祀戚公戎装塑像，方颐隆准，威武庄严。两壁挂有"海疆倭患"、"率兵援闽"、"激战三捷"、"平远庆功"等历史画卷，歌颂戚公抗倭功勋。祠内还陈列有戚继光的军事著作《练兵纪实》、《纪效新书》、战争袍铠甲残片以及行军干粮"光饼"、"征东饼"，还有解放后出土的记功碑残石等，供人观瞻。1936年郁达夫谒祠时，曾赋词《满江红》一阙，词意含蓄深刻，感人肺腑，文辞慷慨激昂，表达了中国人民不可侮的豪迈气概，1978年补镌于祠旁石壁上。
+        </p>
+    </div>
+    <div class="img_content" id="imgContent">
+        <div style="margin: 10px 10px 0 10px;"><img src="" style="height:55vh;width:auto;" id="imgCon"></div>
+        <div class="colse_btn" onclick="col()">关闭</div>
+    </div>
+    <iframe src="navbar.html" style="display:block;" height="126px" width="100%" frameborder="0"></iframe>
+    <div id="CJ" class="dropdown" style="z-index: 1901;display:block;position: absolute;right: 10vw;top:135px;">
+        <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown"
+            style="height: 40px;">场景
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-left" role="menu" aria-labelledby="dropdownMenu1">
+            <li role="presentation">
+                <a role="menuitem" onclick="enter('林文忠公祠')">林文忠公祠</a>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation">
+                <a role="menuitem" onclick="enter('昭忠祠')">昭忠祠</a>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation">
+                <a role="menuitem" onclick="enter('福州开元寺')">福州开元寺</a>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation">
+                <a role="menuitem" onclick="enter('戚公祠')">戚公祠</a>
+            </li>
+        </ul>
+    </div>
+    <a title="返回地图界面" id="quit" style="display:none;z-index: 1901; position: absolute;right: 2vw;top:135px;width: 89px;cursor: pointer;
+        height: 40px;line-height:40px;color: #ebedf0;border-radius: 3px;background-color: rgba(37,37,37,.9);
+        background-image: url(http://api0.map.bdimg.com/images/panorama/indoor_exit.png);background-repeat: no-repeat;
+        background-position: 15px 12px;">
+        <span style="margin-right: 12px; float: right;">返回</span>
+    </a>
+    <a title="显示" id="show" style="display:none;z-index: 1201; position: absolute;right: 16vw;top:135px;width: 89px;cursor: pointer;
+        height: 40px;line-height:40px;color: #ebedf0;border-radius: 3px;background-color: rgba(37,37,37,.9);"><span
+            class="	glyphicon glyphicon-eye-open"
+            style="color: #ebedf0;;margin-left: 15px;margin-right:5px;margin-top:8px;font-size:20px;"></span>
+        <span style="margin-right: 12px; float: right;">显示</span>
+    </a>
+    <a title="隐藏" id="hide" style="display:none;z-index: 1201; position: absolute;right: 25vw;top:135px;width: 89px;cursor: pointer;
+        height: 40px;line-height:40px;color: #ebedf0;border-radius: 3px;background-color: rgba(37,37,37,.9);"><span
+            class="glyphicon glyphicon-eye-close"
+            style="color: #ebedf0;;margin-left: 15px;margin-right:5px;margin-top:8px;font-size:20px;"></span>
+        <span style="margin-right: 12px; float: right;">隐藏</span>
+    </a>
+    <a title="查询" id="qury" style="display:none;z-index: 1201; position: absolute;right: 34vw;top:135px;width: 89px;cursor: pointer;
+        height: 40px;line-height:40px;color: #ebedf0;border-radius: 3px;background-color: rgba(37,37,37,.9);"><span
+            class="	glyphicon glyphicon-question-sign"
+            style="color: #ebedf0;;margin-left: 15px;margin-right:5px;margin-top:8px;font-size:20px;"></span>
+        <span style="margin-right: 12px; float: right;">查询</span>
+    </a>
+
+    <a title="查询" id="qury" style="display:none;z-index: 1201; position: absolute;right: 34vw;top:135px;width: 89px;cursor: pointer;
+        height: 40px;line-height:40px;color: #ebedf0;border-radius: 3px;background-color: rgba(37,37,37,.9);
+        background-image: url(http://api0.map.bdimg.com/images/panorama/indoor_exit.png);background-repeat: no-repeat;
+        background-position: 15px 12px;">
+        <span style="margin-right: 12px; float: right;">查询</span>
+    </a>
+
+    <div class="container" id="allmap" style="width: 100%;height: 83.5vh;">
+
+    </div>
+    <div id="BQ" style="display:none;z-index: 1901; position: absolute;top:100.4vh;width:100%;height: 52px;
+            background-color:white;">
+        </divid="ZZC">
+        <hr>
+        <!-- 底部 -->
+        <div id="foot">
+            <span id="span2">2017级地理信息科学本科团支部</span>
+        </div>
+</body>
+<script>
+    function col() {
+        document.getElementById('imgContent').style.display = 'none';
+    }
+    function showImg(args) {
+        return function (e) {
+            setTimeout(
+                function () {
+                    document.getElementById('imgCon').src = args;
+                    document.getElementById('imgContent').style.display = 'block';
+                    document.getElementById('imgContent').style.display = 'none';
+                }, 1 * 10
+            )
+            setTimeout(
+                function () {
+                    document.getElementById('imgContent').style.display = 'block';
+                    document.getElementById('imgContent').style.left = (document.body.clientWidth - document.getElementById('imgCon').clientWidth) / 2 + "px";
+                }, 1 * 30
+            )
+        }
+    }
+</script>
+<script>
+    i = 0
+    $(".btn1").mouseenter(function () {
+        $("p").slideToggle(); i = 1
+    });
+    $("p").mouseenter(function () {
+        $("p").slideDown();
+    });
+    $("p").mouseout(function () {
+        if (i = 1) { $("p").slideToggle(); i = 0 }
+    });
+</script>
+<script>
+    var map = new BMap.Map("allmap"); // 创建地图实例  
+    var point = new BMap.Point(119.424683, 26.045051); // 创建点坐标  
+    map.centerAndZoom(point, 13); // 初始化地图，设置中心点坐标和地图级别
+    map.enableScrollWheelZoom(); // 滚轮效果
+
+    // 比例尺控件
+    map.addControl(
+        new BMap.ScaleControl({
+            anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+            offset: new BMap.Size(160, 15)
+        })
+    );
+    // 缩略图控件
+    map.addControl(
+        new BMap.OverviewMapControl({
+            anchor: BMAP_ANCHOR_BOTTOM_RIGHT,
+            isOpen: true
+        })
+    );
+
+    //添加坐标自定义显示控件
+    map.addEventListener("mousemove", function (e) {
+        var jing_du_value = e.point.lng;
+        var wei_du_value = e.point.lat;
+        var cengji_value = e.target.getZoom();
+        //alert(e.point.lng + "," + e.point.lat);
+        var a = document.getElementById("a");
+        a.innerHTML = "经度：" + jing_du_value + "丨" + "纬度：" + wei_du_value + "丨" + "放大层级：" + cengji_value;
+    });
+    map.addEventListener("moving", function (e) {
+        const { lng, lat } = map.getCenter();
+        var C_jing_du_value = lng;
+        var C_wei_du_value = lat;
+        //alert(e.point.lng + "," + e.point.lat);
+        var c = document.getElementById("c");
+        c.innerHTML = "地图中心经度：" + C_jing_du_value + "丨" + "地图中心纬度：" + C_wei_du_value;
+    });
+
+    function a() {
+        this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
+        this.defaultOffset = new BMap.Size(1000, 0);
+    }
+    a.prototype = new BMap.Control();
+    a.prototype.initialize = function (map) {
+        var div = document.createElement("div");
+        div.id = "a"
+        div.style.width = "1000px"
+        div.innerText = "经度：119.590546丨纬度：25.880033丨放大层级：11"
+        div.style.width = "350px";
+        map.getContainer().appendChild(div);
+        return div;
+    };
+    var myZoomCtrl = new a();
+    map.addControl(myZoomCtrl);
+    //开源API工具控件
+    function c() {
+        this.defaultAnchor = BMAP_ANCHOR_BOTTOM_RIGHT;
+        this.defaultOffset = new BMap.Size(1000, 16);
+    }
+    c.prototype = new BMap.Control();
+    c.prototype.initialize = function (map) {
+        var div = document.createElement("div");
+        div.id = "c"
+        div.style.width = "1000px"
+        div.style.width = "350px";
+        div.innerText = "地图中心经度：119.41347丨地图中心纬度：26.14965"
+        map.getContainer().appendChild(div);
+        return div;
+    };
+    var myZoomCtrl = new c();
+    map.addControl(myZoomCtrl);
+    //开源API工具控件
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/php/users.php", true);
+    xhr.onload = function () {
+        var users = JSON.parse(this.responseText); //拿数据
+        //多点标注窗体
+        var opts = {
+            enableAutoPan: true, // 是否开启信息窗口打开时地图自动移动，本应开启，但API v3.0 此功能有问题,后面在打开信息窗口内重写这种效果
+        };
+
+        for (var i in users) {
+            if (users[i].name == "林文忠公祠" || users[i].name == "戚公祠" || users[i].name == "福州开元寺" || users[i].name == "马江昭忠祠") {
+                var point = new BMap.Point(users[i].xposition, users[i].yposition);
+                var marker = new BMap.Marker(point);
+
+                var content = '<div class="div2"><div id="' + users[i].name + '" class="carousel slide" style="width: 200px;height: 130px;">' +
+                    '<ol class="carousel-indicators" style="height: 0px">' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="0" class="active"></li>' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="1"></li>' +
+                    '<li data-target="#' + users[i].name + '" data-slide-to="2"></li></ol><div class="carousel-inner" id="pic"><div class="item active">' +
+                    '<img src=' + users[i].img1 + ' alt="First slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第一张</div></div><div class="item">' +
+                    '<img src=' + users[i].img2 + ' alt="Second slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第二张</div></div><div class="item">' +
+                    '<img src=' + users[i].img3 + ' alt="Third slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第三张</div></div></div>' +
+                    '<a class="left carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="prev">' +
+                    '<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>' +
+                    '<span class="sr-only">Previous</span></a>' +
+                    '<a class="right carousel-control" style="background:transparent;" href="#' + users[i].name + '" role="button" data-slide="next">' +
+                    '<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>' +
+                    '<span class="sr-only">Next</span>' +
+                    '</a><div style="background-color: aliceblue;margin-top: 15px;border-radius: 10px;">' +
+                    '<div class="p1"><a >' + users[i].name + '</a></div><div class="p2">' +
+                    '<span class="p">地址：' + users[i].address + '</span><br>' +
+                    '<span class="p">类别：' + users[i].type + '</span><br>' +
+                    '<span class="p">保护等级：' + users[i].grade + '</span><br>' +
+                    '<span class="p">所在地：' + users[i].located + '</span><br>' +
+                    '<span class="p">建造年代：' + users[i].buildtime + '</span><br>' +
+                    '<a id="button2" type="button" class="btn btn-primary" onclick= gointo("' + users[i].name + '")>进入</a>'
+                '</div></div></div></div>'
+
+                map.addOverlay(marker); // 将标注添加到地图中
+                addClickHandler(content, marker);
+                marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+                marker.disableMassClear();
+                label = new BMap.Label(users[i].name, {
+                    offset: new BMap.Size(-20, 25),
+                    enableMassClear: false
+                }); //创建marker点的标记,这里注意下,因为百度地图可以对label样式做编辑,
+                label.setStyle({
+                    background: "rgb(226, 240, 243)",
+                }); //对label 样式隐藏 
+                marker.setLabel(label); //把label设置到maker上 	
+            }
+        }
+
+        function addClickHandler(content, marker) {
+            marker.addEventListener("click", function (e) {
+                openInfo(content, e);
+            });
+        }
+        function openInfo(content, e) {
+            var p = e.target;
+            var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+            var infoWindow = new BMap.InfoWindow(content, opts); // 创建信息窗口对象
+            map.openInfoWindow(infoWindow, point); //开启信息窗口
+        }
+    }
+    xhr.send();
+    gucuo = [
+        { name: "林文忠公祠", ename: "LWZGC", pid: "0800210000141005165939614UZ", pitch: 6, heading: 261 },
+        { name: "昭忠祠", ename: "ZZC", pid: "0900210012170820114403000IN", pitch: 6, heading: 265 },
+        { name: "福州开元寺", ename: "FZKYS", pid: "09002100121706081715371668F", pitch: 9, heading: 0 },
+        { name: "戚公祠", ename: "QGC", pid: "0800210000140807131655301UZ", pitch: 6, heading: 1 },
+    ]
+    function arrayLookup(data, key, value, targetKey) {
+        var targetValue = "";
+        for (var i = 0; i < data.length; i++) {
+            if (data[i][key] == value) {
+                targetValue = data[i][targetKey];
+                break;
+            }
+        }
+        return targetValue;
+    }
+
+    document.getElementById("quit").onclick = function () {
+        window.location.reload()
+    };
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/php/indoors.php", true);
+    xhr.onload = function () {
+        var indoors = JSON.parse(this.responseText);//拿数据
+        function indoorsfun() {
+            document.getElementById("BQ").style.display = "block"
+            document.getElementById("allmap").style.height = "88vh"
+            document.getElementById("quit").style.display = "block"
+            document.getElementById("show").style.display = "block"
+            document.getElementById("hide").style.display = "block"
+            document.getElementById("qury").style.display = "block"
+        }
+        enter = function (name) {
+            var panorama = new BMap.Panorama('allmap'); //全景室内景切换控件默认为显示
+            panorama.setId(arrayLookup(gucuo, 'name', name, 'pid'));
+            panorama.setPov({ pitch: arrayLookup(gucuo, 'name', name, 'pitch'), heading: arrayLookup(gucuo, 'name', name, 'heading') });
+            panorama.setOptions({
+                indoorSceneSwitchControl: true,
+                albumsControl: true,
+                albumsControlOptions: {
+                    anchor: BMAP_ANCHOR_BOTTOM_LEFT,  //设置相册显示位置
+                    offset: new BMap.Size(0, 50),//设置相册距离左上角偏移量
+                    maxWidth: "100%",//设置相册控件的最大显示宽度
+                    imageHeight: 80,//设置相册控件的高度
+                }
+            });
+            indoorsfun();
+            var labels = []
+            for (i in indoors) {
+                var label = new BMap.PanoramaLabel(indoors[i].name, { position: new BMap.Point(indoors[i].xposition, indoors[i].yposition), altitude: indoors[i].alt });
+                label.addEventListener('click', showImg(indoors[i].img));
+                labels[i] = label;
+            }
+
+            panorama.addEventListener('position_changed', function () { //全景图位置改变后，普通地图中心点也随之改变
+                setTimeout(
+                    function () {
+                        for (i in labels) {
+                            panorama.removeOverlay(labels[i]);//在全景地图里添加该标注
+                        }
+                    }, 1 * 10
+                )
+                setTimeout(
+                    function () {
+                        for (i in indoors) {
+                            $(".xx").hide()
+                            if (panorama.getId() == indoors[i].pid) {
+                                panorama.addOverlay(labels[i]);//在全景地图里添加该标注注
+                            }
+                            if (panorama.getId() == arrayLookup(gucuo, 'name', name, 'pid')) {
+                                $("#" + arrayLookup(gucuo, 'name', name, 'ename')).show()
+                            }
+                        }
+                    }, 2 * 100
+                )
+            });
+            document.getElementById("show").onclick = function () {
+                for (i in indoors) {
+                    if (panorama.getId() == indoors[i].pid) {
+                        panorama.addOverlay(labels[i]);//在全景地图里添加该标注注
+                    }
+
+                }
+            };
+            document.getElementById("hide").onclick = function () {
+                for (i in indoors) {
+                    if (panorama.getId() == indoors[i].pid) {
+                        panorama.removeOverlay(labels[i]);//在全景地图里添加该标注注
+                    }
+                }
+            };
+            document.getElementById("qury").onclick = function () {
+                alert(panorama.getId() + "丨" + panorama.getPosition().lng + "丨" + panorama.getPosition().lat + "丨" + panorama.getSceneType())
+            };
+        }
+        gointo = function (a) {
+            enter(a)
+        }
+    }
+    xhr.send();
+</script>
+
+</html>

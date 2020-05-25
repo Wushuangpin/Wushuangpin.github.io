@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Landuse</title>
+    <link rel="stylesheet" href="http://localhost:82/arcgis_js_api/library/3.20/3.20/esri/css/esri.css" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="/css/second.css" rel="stylesheet" type="text/css">
+    <script src="http://localhost:82/arcgis_js_api/library/3.20/3.20/init.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #measuretool {
+            position: absolute;
+            left: 5%;
+            top: 3%;
+            z-index: 50;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="measuretool" class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="width:96px"
+            onclick=display()>测量工具<span class="caret"></span>
+        </button>
+        <ul id="ul" class="dropdown-menu" role="menu" style="min-width:10px;">
+            <li><a href="javascript:void(0)" id="line">距离测量</a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:void(0)" id="type" title="<a>几何类型</a>" data-container="body" data-toggle="popover"
+                    data-content="<a onclick=rectangle() href='javascript:void(0)'>矩形</a><br><a onclick=circle() href='javascript:void(0)'>圆形</a><br><a onclick=ellipse() href='javascript:void(0)'>椭圆形</a><br><a onclick=polygon() href='javascript:void(0)'>多边形</a>">
+                    面积测量
+                </a></li>
+            <li class="divider"></li>
+            <li><a href="javascript:void(0)" id="clear">清除覆盖</a></li>
+        </ul>
+    </div>
+</body>
+<script>
+    var map, toolbar, symbol, geomTask;
+    var i = 0;
+    require([
+        "esri/map",
+        "esri/config",
+        "esri/layers/ArcGISDynamicMapServiceLayer",
+        "esri/layers/GraphicsLayer",
+        "esri/symbols/SimpleLineSymbol",
+        "esri/symbols/SimpleFillSymbol",
+        "esri/Color",
+        "esri/toolbars/draw",
+        "esri/graphic",
+        "esri/tasks/FeatureSet",
+        "esri/tasks/Geoprocessor",
+        "dojo/_base/event",
+        "esri/tasks/LengthsParameters",
+        "esri/tasks/AreasAndLengthsParameters"
+    ], function (Map, esriConfig, ArcGISDynamicMapServiceLayer, GraphicsLayer, SimpleLineSymbol, SimpleFillSymbol, Color, Draw, Graphic, FeatureSet, Geoprocessor, event, LengthsParameters, AreasAndLengthsParameters) {
+        map = new Map("map", {
+            center: [119.30842, 26.024367],
+            zoom: 13,
+            basemap: "topo"
+        });
+        var dylayer = new ArcGISDynamicMapServiceLayer("http://localhost:6080/arcgis/rest/services/my/poi/MapServer");
+        map.addLayer(dylayer);
+        measurelayer = new GraphicsLayer();
+        map.addLayer(measurelayer);
+        toolbar = new Draw(map)
+        toolbar.on("draw-complete", drawcomplete);
+        function drawcomplete(evt) {
+            measuregeometry = evt.geometry;
+            toolbar.deactivate();
+            if (evt.geometry.type == 'polyline') {
+                var measuresymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASH, new Color("black"), 2)
+            }
+            if (evt.geometry.type == 'polygon') {
+                var measuresymbol = new SimpleFillSymbol(
+                    SimpleFillSymbol.STYLE_SOLID,
+                    new SimpleLineSymbol(SimpleLineSymbol.STYLE_DASHDOT, new Color([255, 0, 0]), 2),
+                    new Color([255, 255, 0, 0.25])
+                );
+            }
+            var newGraphic = new Graphic(evt.geometry, measuresymbol)
+            measurelayer.clear();
+            measurelayer.add(newGraphic);
+            MeasureGeometry(evt.geometry);
+        }
+        geometryService = new esri.tasks.GeometryService("http://localhost:6080/arcgis/rest/services/Utilities/Geometry/GeometryServer");
+
+        function MeasureGeometry(geometry) {
+            //如果为线类型就进行lengths距离测算 
+            if (geometry.type == "polyline") {
+                var lengthParams = new esri.tasks.LengthsParameters();
+                lengthParams.polylines = [geometry];
+                lengthParams.lengthUnit = esri.tasks.GeometryService.UNIT_METER;
+                lengthParams.geodesic = true;
+                lengthParams.polylines[0].spatialReference = new esri.SpatialReference(4326);
+                geometryService.lengths(lengthParams);
+                dojo.connect(geometryService, "onLengthsComplete", outputDistance);
+            }
+            //如果为面类型需要先进行simplify操作在进行面积测算 
+            else if (geometry.type == "polygon") {
+                var areasAndLengthParams = new esri.tasks.AreasAndLengthsParameters();
+                areasAndLengthParams.lengthUnit = esri.tasks.GeometryService.UNIT_METER;
+                areasAndLengthParams.areaUnit = esri.tasks.GeometryService.UNIT_SQUARE_METERS;
+                this.outSR = new esri.SpatialReference({ wkid: 102113 });
+                geometryService.project([geometry], this.outSR, function (geometry) {
+                    geometryService.simplify(geometry, function (simplifiedGeometries) {
+                        areasAndLengthParams.polygons = simplifiedGeometries;
+                        areasAndLengthParams.polygons[0].spatialReference = new esri.SpatialReference(102113);
+                        geometryService.areasAndLengths(areasAndLengthParams);
+                    });
+                });
+                dojo.connect(geometryService, "onAreasAndLengthsComplete", outputAreaAndLength);
+            }
+        }
+        //显示测量距离 
+        function outputDistance(result) {
+            var CurX = measuregeometry.paths[0][measuregeometry.paths[0].length - 1][0];
+            var CurY = measuregeometry.paths[0][measuregeometry.paths[0].length - 1][1];
+            var CurPos = new esri.geometry.Point(CurX, CurY, map.spatialReference);
+            map.infoWindow.setTitle("距离测量");
+            map.infoWindow.setContent(" 测量长度 ： <strong>" + parseInt(String(result.lengths[0])) + "米</strong>");
+            map.infoWindow.show(CurPos);
+        }
+
+        //显示测量面积 
+        function outputAreaAndLength(result) {
+            var CurX = (measuregeometry.cache._extent.xmax + measuregeometry.cache._extent.xmin) / 2;
+            var CurY = (measuregeometry.cache._extent.ymax + measuregeometry.cache._extent.ymin) / 2
+            var CurPos = new esri.geometry.Point(CurX, CurY, map.spatialReference);
+            map.infoWindow.setTitle("面积测量");
+            map.infoWindow.setContent(" 面积：<strong>" + parseInt(String(result.areas[0])) + "平方米</strong><br>周长：<strong>" + parseInt(String(result.lengths[0])) + "米</strong>");
+            map.infoWindow.show(CurPos);
+            //alert("面积：" + dojo.number.format(result.areas[0]) + "平方米" + " 长度：" + dojo.number.format(result.lengths[0]) + "米"); 
+        }
+
+        $(function () {
+            $("#type").popover({ html: true });
+        });
+
+        display = function () {
+            $("#ul").slideToggle()
+            document.getElementById("type").click()
+            if (i == 1) {
+                document.getElementById("type").click()
+            }
+            if ($("[class='popover fade right in']").length > 0) {
+                document.getElementById("type").click()
+            }
+        }
+        rectangle = function () {
+            toolbar.activate(Draw.RECTANGLE);
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+        }
+        circle = function () {
+            toolbar.activate(Draw.CIRCLE);
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+        }
+        polygon = function () {
+            toolbar.activate(Draw.POLYGON);
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+        }
+        ellipse = function () {
+            toolbar.activate(Draw.ELLIPSE);
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+        }
+        dojo.connect(dojo.byId("line"), "click", function () {
+            toolbar.activate(Draw.POLYLINE);
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+        })
+        dojo.connect(dojo.byId("clear"), "click", function () {
+            measurelayer.clear();
+            $("#ul").slideToggle()
+            $("[class='popover fade right in']").remove()
+            i = 1
+            map.infoWindow.hide();
+        })
+    });
+</script>
+
+</html>
