@@ -28,14 +28,14 @@
 			margin: 0;
 		}
 
-		/* .label {
-			font-weight: 700;
+		.label {
+			font-weight: 3000;
 			text-transform: uppercase;
 			text-align: center;
 			margin-top: -1em;
 			visibility: hidden;
-			color: black
-		} */
+			font-size: 10px;
+		}
 	</style>
 	<title>leaflet加载天地图</title>
 </head>
@@ -45,8 +45,8 @@
 	<script type="text/javascript">
 		//地图初始化，设置中心位置及显示级别
 		var map = L.map('map', {
-			center: [26.0710, 119.3075],
-			zoom: 12
+			center: [26.03276, 119.20553],
+			zoom: 16
 		}
 		);
 		//设置天地图的电子地图数据的来源。
@@ -87,41 +87,13 @@
 		}
 		//定义办公楼标记 
 
-		//使用Ajax插件，加载geojson数据。
-		var gucuo = new L.GeoJSON.AJAX('/data/data.json', {
-			//针对每个要素，在加载时绑定一个弹出框
-			onEachFeature: function (feature, layer) {
-				layer.bindPopup('<div id="' + feature.properties.name + '" class="carousel slide" style="width: 200px;">' +
-					'<ol class="carousel-indicators" style="height: 0px">' +
-					'<li data-target="#' + feature.properties.name + '" data-slide-to="0" class="active"></li>' +
-					'<li data-target="#' + feature.properties.name + '" data-slide-to="1"></li>' +
-					'<li data-target="#' + feature.properties.name + '" data-slide-to="2"></li></ol><div class="carousel-inner" id="pic"><div class="item active">' +
-					'<img src=' + feature.properties.img1 + ' alt="First slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第一张</div></div><div class="item">' +
-					'<img src=' + feature.properties.img2 + ' alt="Second slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第二张</div></div><div class="item">' +
-					'<img src=' + feature.properties.img3 + ' alt="Third slide" style="width: 200px;height: 130px;"><div class="carousel-caption" style="width: 120px;height: 0px;">第三张</div></div></div>' +
-					'<a class="left carousel-control" style="background:transparent;" href="#' + feature.properties.name + '" role="button" data-slide="prev">' +
-					'<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>' +
-					'<span class="sr-only">Previous</span></a>' +
-					'<a class="right carousel-control" style="background:transparent;" href="#' + feature.properties.name + '" role="button" data-slide="next">' +
-					'<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>' +
-					'<span class="sr-only">Next</span></a></div>' +
-					'<div style="background-color: aliceblue;margin-top: 15px;border-radius: 10px;width: 200px;">' +
-					'<div class="p1" style="padding-top: 5px;"><a >' + feature.properties.name + '</a></div><div class="p2">' +
-					'<span class="p">地址：' + feature.properties.address + '</span><br>' +
-					'<span class="p">类别：' + feature.properties.type + '</span><br>' +
-					'<span class="p">保护等级：' + feature.properties.grade + '</span><br>' +
-					'<span class="p">所在地：' + feature.properties.located + '</span><br>' +
-					'<span class="p">建造年代：' + feature.properties.buildtime + '</span><br>' +
-					'<a id="button2" type="button" class="btn btn-default" onclick= swal("' + feature.properties.name + '","' + feature.properties.xiangxi + '")>详情</a></div></div>');
-			}
-		});
-		gucuo.addTo(map);
-
-		/* var sd = new L.GeoJSON.AJAX('/data/data2.json', {
+		var sd = new L.GeoJSON.AJAX('/data/data2.json', {
+			style: styleFunction,
 			//针对每个要素，在加载时绑定一个弹出框
 			onEachFeature: function (feature, layer) {
 				console.log(feature)
 				console.log(layer)
+				/* layer.bindPopup('<div>' + feature.properties.name + '<div><br>' + '<img src=' + feature.properties.img + ' style="width: 200px;height: 130px;">' + feature.properties.type + '<div>'); */
 				layer.bindPopup('<div style="background-color: aliceblue;margin-top: 15px;border-radius: 10px;width: 200px;">' +
 					'<div class="p1"><a >' + feature.properties.Name + '</a></div><div class="p2" style="padding: 5px 10px 5px 10px">' +
 					'<span class="p">类型：' + feature.properties.Type + '</span><br>' +
@@ -130,7 +102,7 @@
 					'<span class="p">居住人数：' + feature.properties.peoplelive + '</span><br>' +
 					'<span class="p">高度：' + feature.properties.Height + '</span></div></div>');
 
-				if (feature.properties.f != "") {
+				if ((feature.properties.f != "") && (feature.properties.Type != "体育设施")) {
 					var label = L.marker(layer.getBounds().getCenter(), {
 						icon: L.divIcon({
 							className: 'label',
@@ -141,16 +113,16 @@
 				}
 			}
 		});
-		sd.addTo(map); */
+		sd.addTo(map);
 
+		//将两个图层组，组成一个对象集合。
 		var myLayers = {
-			"古厝": gucuo,
-			//"师大设施": sd,
+			"师大设施": sd,
 		};
 
 		L.control.layers(baseLayers, myLayers).addTo(map);
 
-		/* map.on('zoomend', function (e) {
+		map.on('zoomend', function (e) {
 			if (map.getZoom() >= 17) {
 				var a = document.getElementsByClassName("leaflet-marker-icon label leaflet-zoom-animated leaflet-clickable")
 				for (i = 0; i < a.length; i++) {
@@ -164,7 +136,33 @@
 					a[i].style.visibility = "hidden";
 				}
 			}
-		}) */
+		})
+
+		/* 	map.on('click', function (e) {
+				L.popup().setLatLng(e.latlng).setContent(e.latlng.toString()).openOn(map)
+			}) */
+		function styleFunction(feature) {
+			switch (feature.properties.Height) {
+				case 0:
+					return {
+						color: "green",
+						opacity: 1,
+					};
+					break;
+				case 1:
+					return {
+						color: "red",
+						opacity: 1,
+					};
+					break;
+				case 21:
+					return {
+						color: "red",
+						opacity: 1,
+					};
+					break;
+			}
+		}
 	</script>
 </body>
 
