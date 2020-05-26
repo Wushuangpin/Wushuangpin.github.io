@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/images/title.ico" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>坐标转换</title>
+</head>
+
+<body>
+    <h1 style="text-align: center;margin-bottom: 20px;">百度坐标、火星坐标、WGS84坐标转换（JS版）</h2>
+            <table style="margin-bottom: 5px;" class="table table-hover" border="1px solid gray">
+                <thead>
+                    <tr>
+                        <th>原坐标系</th>
+                        <th>原坐标</th>
+                        <th>转换坐标系</th>
+                        <th>转换坐标</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-control" id="select-input">
+                                <option value="1">BD-09（百度坐标）</option>
+                                <option value="2">GCJ-02（火星坐标）</option>
+                                <option value="3">WGS84</option>
+                            </select>
+                        </td>
+                        <td><input id="input-lon" class='form-control' value="119.3333294200" placeholder="请输入经度"
+                                style="width: 200px;margin-right: 3%;float: left;" /><input id="input-lat"
+                                class='form-control' value="27.2202520900" placeholder="请输入纬度" style="width: 200px;" />
+                        </td>
+                        <td>
+                            <select class="form-control" id="select-output">
+                                <option value="1">BD-09（百度坐标）</option>
+                                <option value="2" selected="selected">GCJ-02（火星坐标）</option>
+                                <option value="3">WGS84</option>
+                            </select>
+                        </td>
+                        <td><input id="output-lon" class='form-control' placeholder="转换经度"
+                                style="width: 200px;margin-right: 3%;float: left;" /><input id="output-lat"
+                                class='form-control' placeholder="转换纬度" style="width: 200px;" /></td>
+                        <td>
+                            <a class="btn btn-danger add" onclick="transform()">转换</a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div id="txt1" style="float: left;margin-right: 30px;"></div>
+            <div id="txt2"  style="float: left;"></div>
+</body>
+<script>
+    var x_PI = 3.14159265358979324 * 3000.0 / 180.0;
+    var PI = 3.1415926535897932384626;
+    var a = 6378245.0;
+    var ee = 0.00669342162296594323;
+    function transform() {
+        inputlon = document.getElementById("input-lon").value
+        inputlat = document.getElementById("input-lat").value
+
+        var obj1 = document.getElementById("select-input"); //定位id
+        var index1 = obj1.selectedIndex; // 选中索引
+        var selectinput = obj1.options[index1].value; // 选中值
+
+        var obj2 = document.getElementById("select-output"); //定位id
+        var index2 = obj2.selectedIndex; // 选中索引
+        var selectoutput = obj2.options[index2].value; // 选中值
+
+        if (selectinput == "1" && selectoutput == "1") {
+            document.getElementById("output-lon").value = inputlon
+            document.getElementById("output-lat").value = inputlat
+        }
+        if (selectinput == "2" && selectoutput == "2") {
+            document.getElementById("output-lon").value = inputlon
+            document.getElementById("output-lat").value = inputlat
+        }
+        if (selectinput == "3" && selectoutput == "3") {
+            document.getElementById("output-lon").value = inputlon
+            document.getElementById("output-lat").value = inputlat
+        }
+        if (selectinput == "1" && selectoutput == "2") {
+            outputlon = BD_TO_GCJ(inputlon, inputlat)[0]
+            outputlat = BD_TO_GCJ(inputlon, inputlat)[1]
+            console.log("百度坐标转火星坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+        if (selectinput == "1" && selectoutput == "3") {
+            outputlon = BD_TO_WGS(inputlon, inputlat)[0]
+            outputlat = BD_TO_WGS(inputlon, inputlat)[1]
+            console.log("百度坐标转WGS84坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+        if (selectinput == "2" && selectoutput == "3") {
+            outputlon = GCJ_TO_WGS(inputlon, inputlat)[0]
+            outputlat = GCJ_TO_WGS(inputlon, inputlat)[1]
+            console.log("火星坐标转WGS84坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+        if (selectinput == "2" && selectoutput == "1") {
+            outputlon = GCJ_TO_BD(inputlon, inputlat)[0]
+            outputlat = GCJ_TO_BD(inputlon, inputlat)[1]
+            console.log("火星坐标转百度坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+        if (selectinput == "3" && selectoutput == "2") {
+            outputlon = WGS_TO_GCJ(inputlon, inputlat)[0]
+            outputlat = WGS_TO_GCJ(inputlon, inputlat)[1]
+            console.log("WGS坐标转火星坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+        if (selectinput == "3" && selectoutput == "1") {
+            outputlon = WGS_TO_GCJ(inputlon, inputlat)[0]
+            outputlat = WGS_TO_GCJ(inputlon, inputlat)[1]
+            console.log("WGS坐标转百度坐标，经度：" + outputlon + "," + "纬度：" + outputlat)
+            document.getElementById("output-lon").value = outputlon
+            document.getElementById("output-lat").value = outputlat
+        }
+    }
+
+    function BD_TO_GCJ(bd_lon, bd_lat) {
+        var x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+        var x = bd_lon - 0.0065;
+        var y = bd_lat - 0.006;
+        var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi);
+        var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi);
+        var gg_lng = z * Math.cos(theta);
+        var gg_lat = z * Math.sin(theta);
+        return [gg_lng, gg_lat]
+    }
+
+    function GCJ_TO_WGS(lng, lat) {
+        var dlat = transformlat(lng - 105.0, lat - 35.0);
+        var dlng = transformlng(lng - 105.0, lat - 35.0);
+        var radlat = lat / 180.0 * PI;
+        var magic = Math.sin(radlat);
+        magic = 1 - ee * magic * magic;
+        var sqrtmagic = Math.sqrt(magic);
+        dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+        dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+        mglat = lat + dlat;
+        mglng = lng + dlng;
+        return [lng * 2 - mglng, lat * 2 - mglat]
+    }
+
+    function BD_TO_WGS(bd_lon, bd_lat) {
+        lng = BD_TO_GCJ(bd_lon, bd_lat)[0]
+        lat = BD_TO_GCJ(bd_lon, bd_lat)[1]
+        var dlat = transformlat(lng - 105.0, lat - 35.0);
+        var dlng = transformlng(lng - 105.0, lat - 35.0);
+        var radlat = lat / 180.0 * PI;
+        var magic = Math.sin(radlat);
+        magic = 1 - ee * magic * magic;
+        var sqrtmagic = Math.sqrt(magic);
+        dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+        dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+        mglat = lat + dlat;
+        mglng = lng + dlng;
+        return [lng * 2 - mglng, lat * 2 - mglat]
+    }
+
+
+    function GCJ_TO_BD(lng, lat) {
+        var z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * x_PI);
+        var theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * x_PI);
+        var bd_lng = z * Math.cos(theta) + 0.0065;
+        var bd_lat = z * Math.sin(theta) + 0.006;
+        return [bd_lng, bd_lat]
+    }
+
+    function WGS_TO_GCJ(lng, lat) {
+        var dlat = transformlat(lng - 105.0, lat - 35.0);
+        var dlng = transformlng(lng - 105.0, lat - 35.0);
+        var radlat = lat / 180.0 * PI;
+        var magic = Math.sin(radlat);
+        magic = 1 - ee * magic * magic;
+        var sqrtmagic = Math.sqrt(magic);
+        dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+        dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+        var mglat = lat + dlat;
+        var mglng = lng + dlng;
+        return [mglng, mglat]
+    }
+
+    function WGS_TO_BD(wgs_lon, wgs_lat) {
+        lng = WGS_TO_GCJ(wgs_lon, wgs_lat)[0]
+        lat = WGS_TO_GCJ(wgs_lon, wgs_lat)[1]
+        var z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * x_PI);
+        var theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * x_PI);
+        var bd_lng = z * Math.cos(theta) + 0.0065;
+        var bd_lat = z * Math.sin(theta) + 0.006;
+        return [bd_lng, bd_lat]
+    }
+
+    function transformlat(lng, lat) {
+        var ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
+        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
+        ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0;
+        return ret
+    }
+
+    function transformlng(lng, lat) {
+        var ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
+        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
+        ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0;
+        return ret
+    }
+
+    var data = [
+        { "lng": "119.511646", "lat": "26.053467" },
+        { "lng": "119.334428", "lat": "26.048704" },
+        { "lng": "119.316026", "lat": "26.085014" },
+        { "lng": "119.2486", "lat": "26.07921" },
+        { "lng": "119.511646", "lat": "26.053467" },
+        { "lng": "119.513029", "lat": "26.053057" },
+        { "lng": "119.608417", "lat": "26.146585" },
+        { "lng": "119.519772", "lat": "26.064834" },
+        { "lng": "119.53066", "lat": "26.061709" },
+        { "lng": "119.3816", "lat": "26.027335" },
+        { "lng": "119.50716", "lat": "26.018055" },
+        { "lng": "119.31533", "lat": "26.061047" },
+        { "lng": "119.305335", "lat": "26.054059" },
+        { "lng": "118.991189", "lat": "26.168134" },
+        { "lng": "119.373643", "lat": "26.018713" },
+        { "lng": "119.511646", "lat": "26.053467" },
+        { "lng": "119.471819", "lat": "25.702828" },
+        { "lng": "119.290659", "lat": "26.003295" },
+        { "lng": "119.175759", "lat": "26.081867" },
+        { "lng": "119.369161", "lat": "26.17971" },
+        { "lng": "119.326491", "lat": "26.069831" },
+        { "lng": "119.319939", "lat": "26.080741" },
+        { "lng": "119.2603", "lat": "25.941366" },
+        { "lng": "119.312054", "lat": "26.056152" },
+        { "lng": "119.284252", "lat": "26.451654" },
+        { "lng": "119.322879", "lat": "26.067518" },
+        { "lng": "119.314133", "lat": "26.059317" },
+        { "lng": "119.300351", "lat": "26.091673" },
+        { "lng": "119.065037", "lat": "26.522745" },
+        { "lng": "118.913196", "lat": "26.1547" },
+        { "lng": "118.913196", "lat": "26.1547" },
+        { "lng": "118.913196", "lat": "26.1547" },
+        { "lng": "118.913196", "lat": "26.1547" },
+        { "lng": "119.398102", "lat": "25.91161" },
+        { "lng": "119.293955", "lat": "26.090352" },
+        { "lng": "119.332912", "lat": "25.596941" },
+        { "lng": "119.332912", "lat": "25.596941" },
+        { "lng": "119.311446", "lat": "26.062851" },
+        { "lng": "119.303328", "lat": "26.089574" },
+        { "lng": "119.306613", "lat": "26.08366" },
+        { "lng": "118.856544", "lat": "26.136017" },
+        { "lng": "118.942118", "lat": "25.873211" },
+        { "lng": "119.564264", "lat": "25.905364" },
+        { "lng": "119.301081", "lat": "26.087701" },
+        { "lng": "119.332912", "lat": "25.596941" },
+        { "lng": "119.24266", "lat": "26.073431" },
+        { "lng": "119.298535", "lat": "26.092426" },
+        { "lng": "119.285239", "lat": "26.006559" },
+        { "lng": "119.303863", "lat": "26.09136" },
+        { "lng": "119.32164", "lat": "26.044102" },
+        { "lng": "119.302337", "lat": "26.091748" },
+        { "lng": "119.394073", "lat": "25.990191" },
+        { "lng": "119.3026", "lat": "26.0879" },
+        { "lng": "119.316", "lat": "26.0863" },
+        { "lng": "119.3057", "lat": "26.0879" },
+        { "lng": "119.3023", "lat": "26.086" },
+        { "lng": "119.3054", "lat": "26.0897" },
+        { "lng": "119.3014", "lat": "26.0876" },
+        { "lng": "119.3029", "lat": "26.0898" },
+        { "lng": "119.055105", "lat": "26.40255" },
+        { "lng": "119.263577", "lat": "25.646053" },
+        { "lng": "119.429634", "lat": "26.043212" },
+        { "lng": "119.402056", "lat": "26.06174" },
+        { "lng": "119.284362", "lat": "26.077106" },
+        { "lng": "119.494506", "lat": "26.061845" },
+        { "lng": "119.051322", "lat": "26.40452" },
+        { "lng": "118.95264", "lat": "26.149608" },
+        { "lng": "119.04322", "lat": "26.30232" },
+        { "lng": "119.312095", "lat": "26.085824" },
+        { "lng": "119.312852", "lat": "26.083398" },
+        { "lng": "119.470479", "lat": "25.713822" },
+        { "lng": "119.553486", "lat": "26.486913" },
+        { "lng": "119.553486", "lat": "26.486913" },
+        { "lng": "119.30338", "lat": "26.106326" },
+        { "lng": "119.308233", "lat": "26.095918" },
+        { "lng": "119.099818", "lat": "25.89751" },
+        { "lng": "118.796865", "lat": "25.798003" },
+        { "lng": "119.326365", "lat": "26.098198" },
+        { "lng": "119.304574", "lat": "26.081851" },
+        { "lng": "119.315456", "lat": "26.084745" },
+        { "lng": "118.806358", "lat": "25.882203" },
+        { "lng": "119.248792", "lat": "26.110948" },
+        { "lng": "119.310174", "lat": "26.047343" },
+        { "lng": "119.283303", "lat": "26.000617" },
+        { "lng": "119.521373", "lat": "26.0756" },
+        { "lng": "119.356306", "lat": "25.987806" },
+        { "lng": "119.244725", "lat": "26.102413" },
+        { "lng": "119.308538", "lat": "26.045174" },
+        { "lng": "119.39873", "lat": "25.897725" },
+        { "lng": "119.464208", "lat": "25.988653" },
+        { "lng": "119.401917", "lat": "26.061482" },
+        { "lng": "119.238404", "lat": "26.078517" },
+        { "lng": "119.369849", "lat": "26.024527" },
+        { "lng": "119.362136", "lat": "26.024941" },
+        { "lng": "119.22688", "lat": "25.979923" },
+        { "lng": "119.303186", "lat": "26.088452" },
+        { "lng": "119.307314", "lat": "26.086825" },
+        { "lng": "119.378325", "lat": "26.022859" },
+        { "lng": "119.21108", "lat": "25.807578" },
+        { "lng": "119.79731", "lat": "26.27846" },
+        { "lng": "119.63009", "lat": "25.97672" },
+        { "lng": "119.38811", "lat": "26.19634" },
+        { "lng": "119.976", "lat": "26.3662" },
+        { "lng": "119.303429", "lat": "26.088837" },
+        { "lng": "119.356893", "lat": "25.992735" },
+        { "lng": "119.301392", "lat": "26.087518" },
+        { "lng": "119.303978", "lat": "26.089792" },
+        { "lng": "119.3028347", "lat": "26.08565374" },
+        { "lng": "119.296756", "lat": "26.0826" },
+        { "lng": "119.3040047", "lat": "26.08944074" },
+        { "lng": "119.505063", "lat": "26.006322" },
+        { "lng": "119.311677", "lat": "26.092566" },
+        { "lng": "119.347765", "lat": "26.068742" },
+        { "lng": "113.2941", "lat": "23.00928" },
+        { "lng": "119.4521", "lat": "25.98466" },
+        { "lng": "119.3957", "lat": "26.05558" },
+        { "lng": "119.4316", "lat": "26.59644" },
+        { "lng": "118.81555", "lat": "26.1169" },
+        { "lng": "119.33184", "lat": "26.045572" },
+        { "lng": "119.470955", "lat": "25.880045" },
+        { "lng": "119.312918", "lat": "26.083937" },
+        { "lng": "119.312769", "lat": "26.083876" },
+        { "lng": "119.312999", "lat": "26.083914" },
+        { "lng": "119.391599", "lat": "25.720207" },
+        { "lng": "119.345403", "lat": "26.096877" },
+        { "lng": "119.366134", "lat": "26.548686" },
+        { "lng": "119.377274", "lat": "25.93155" },
+        { "lng": "119.438763", "lat": "25.883994" },
+        { "lng": "119.311918", "lat": "26.09502" },
+        { "lng": "119.308473", "lat": "26.084822" },
+        { "lng": "118.874483", "lat": "26.229501" },
+        { "lng": "119.356929", "lat": "25.98581" },
+        { "lng": "119.308338", "lat": "26.092882" },
+        { "lng": "119.319802", "lat": "26.049358" },
+        { "lng": "119.322134", "lat": "26.050212" },
+        { "lng": "119.320785", "lat": "26.049144" },
+        { "lng": "119.316013", "lat": "26.048764" },
+        { "lng": "119.32611", "lat": "26.046527" },
+        { "lng": "119.322134", "lat": "26.050212" },
+        { "lng": "119.31179", "lat": "26.043017" },
+        { "lng": "119.314121", "lat": "26.046183" },
+        { "lng": "119.320351", "lat": "26.052125" },
+        { "lng": "119.322606", "lat": "26.048191" },
+        { "lng": "119.457553", "lat": "25.989324" },
+        { "lng": "119.315276", "lat": "26.055465" },
+        { "lng": "119.331654", "lat": "26.053839" },
+        { "lng": "119.303042", "lat": "26.091789" },
+        { "lng": "119.313041", "lat": "26.060709" },
+        { "lng": "119.316975", "lat": "26.050404" },
+        { "lng": "119.308011", "lat": "26.055602" },
+        { "lng": "119.308011", "lat": "26.055602" },
+        { "lng": "119.314742", "lat": "26.061026" },
+        { "lng": "119.353871", "lat": "25.985847" },
+        { "lng": "119.304741", "lat": "26.08777" },
+        { "lng": "119.566759", "lat": "25.958573" },
+        { "lng": "119.301392", "lat": "26.087518" },
+        { "lng": "119.300247", "lat": "26.087456" },
+        { "lng": "119.616253", "lat": "25.957793" },
+        { "lng": "119.305763", "lat": "25.810081" },
+        { "lng": "119.30049", "lat": "26.016071" },
+        { "lng": "119.307097", "lat": "26.083341" },
+        { "lng": "119.504958", "lat": "26.006235" },
+        { "lng": "119.373124", "lat": "25.734204" },
+        { "lng": "119.522031", "lat": "25.96732" },
+        { "lng": "119.392277", "lat": "25.718798" },
+        { "lng": "119.416602", "lat": "26.00082" },
+        { "lng": "119.312221", "lat": "26.095194" },
+        { "lng": "119.207327", "lat": "26.097776" }
+    ]
+
+    for (i = 0; i < data.length; i++) {
+        var newposition = BD_TO_WGS(data[i].lng, data[i].lat)
+        document.getElementById("txt1").innerHTML += newposition[0] + "<br>"
+        document.getElementById("txt2").innerHTML += newposition[1] + "<br>"
+        /* console.log(data[i].lat) */
+    }
+</script>
+
+</html>

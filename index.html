@@ -33,6 +33,9 @@
                 <li><a name="/one/indexTianDiTu.html" onclick=change(this.name) href="javascript:void(0)"><span
                             class="glyphicon glyphicon-facetime-video"
                             style="color: black;margin-right: 5px;"></span>天地图</a></li>
+                <li><a name="/one/indexArcGIS.html" onclick=change(this.name) href="javascript:void(0)"><span
+                            class="glyphicon glyphicon-facetime-video"
+                            style="color: black;margin-right: 5px;"></span>ArcGIS在线</a></li>
                 <li><a name="/one/indexGaoDe.html" onclick=change(this.name) href="javascript:void(0)"><span
                             class="glyphicon glyphicon-heart" style="color: black;margin-right: 5px;"></span>高德</a>
                 </li>
@@ -50,11 +53,15 @@
                 </li>
             </ul>
         </li>
-        <li role="presentation" id="bar-1"><a name="map.html" onclick=change(this.name) href="javascript:void(0)"><span
-                    class="	glyphicon glyphicon-globe" style="color: black;margin-right: 5px;"></span>加载离线数据图层</a></li>
+        <li role="presentation" id="bar-1"><a name="/two/data.html" onclick=change(this.name)
+                href="javascript:void(0)"><span class="	glyphicon glyphicon-globe"
+                    style="color: black;margin-right: 5px;"></span>加载离线数据图层</a></li>
+        <li role="presentation" id="bar-1"><a name="/four/transform.html" onclick=change(this.name)
+                href="javascript:void(0)"><span class="	glyphicon glyphicon-globe"
+                    style="color: black;margin-right: 5px;"></span>坐标转换</a></li>
     </ul>
     <div class="v-line"></div>
-    <iframe id="iframe" src="/one/indexTianDiTu.html" frameborder="0"></iframe>
+    <iframe id="iframe" src="/two/data.html" frameborder="0"></iframe>
 </body>
 <script>
     function change(url) {
