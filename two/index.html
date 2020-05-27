@@ -42,8 +42,8 @@
 
 		#button {
 			position: absolute;
-			right: 5vw;
-			top: 2vh;
+			right: 8%;
+			top: 2%;
 		}
 
 		.sweetAlert {
@@ -52,8 +52,18 @@
 			left: 0;
 			right: 0;
 		}
+
+		.position {
+			position: absolute;
+			bottom: 1%;
+			left: 1%;
+			z-index: 1;
+			font-size: 15px;
+			color: black;
+			font-weight: 700;
+		}
 	</style>
-	 <title>GIS应用开发方法实验二</title>
+	<title>GIS应用开发方法实验二</title>
 </head>
 
 <body>
@@ -68,7 +78,13 @@
 			<li><a href="javascript:void(0)" onclick="TJ_peoplelive()">基于居住人数字段</a></li>
 		</ul>
 	</div>
-
+	<div class="position">
+		指针经度：<span id="mouse_lng">119.21256</span>°
+		指针纬度：<span id="mouse_lat">26.03750</span>°<br>
+		中心经度：<span id="center_lng">119.21256</span>°
+		中心纬度：<span id="center_lat">26.03750</span>°
+		当前缩放等级：<span id="level">15</span>级
+	</div>
 	<script type="text/javascript">
 		//地图初始化，设置中心位置及显示级别
 		function delRepeat(arr) {
@@ -135,18 +151,16 @@
 		for (let index in type) {
 			type_result.push({ value: type_count[index], name: type[index] });
 		}
-		console.log(type_result)
 
 		let type_result2 = [];
 		for (let index in type) {
 			type_result2.push({ value: type_area[index].toFixed(0), name: type[index] });
 		}
-		console.log(type_result2)
 
 		var type_color = ["RGB(255,217,0)", "RGB(76,230,0)", "RGB(255,255,0)", "RGB(255,255,115)", "RGB(197,219,0)", "RGB(255,132,0)", "RGB(115,178,255)", "RGB(146,186,0)", "RGB(115,115,0)", "RGB(255,174,0)", "RGB(97,153,0)"]
 
 		peoplelive = ["0-131人", "131-344人", "344-444人", "444-575人", "575-846人",]
-		console.log(p)
+		/* console.log(p) */
 
 		var peoplelive_count = []
 		var peoplelive_area = []
@@ -180,21 +194,32 @@
 		for (let index in peoplelive) {
 			peoplelive_result.push({ value: peoplelive_count[index], name: peoplelive[index] });
 		}
-		console.log(peoplelive_result)
 
 		let peoplelive_result2 = [];
 		for (let index in peoplelive) {
 			peoplelive_result2.push({ value: peoplelive_area[index].toFixed(0), name: peoplelive[index] });
 		}
-		console.log(peoplelive_result2)
 
 		var peoplelive_color = ["RGB(255,217,0)", "RGB(76,230,0)", "RGB(255,255,0)", "RGB(255,255,115)", "RGB(197,219,0)"]
 
 		var map = L.map('map', {
 			center: [26.03276, 119.20553],
-			zoom: 16
+			zoom: 15,
+			scrollWheelZoom: true
 		}
 		);
+
+		map.on('mousemove', function (e) {
+			document.getElementById("mouse_lng").innerHTML = e.latlng.lng.toFixed(5)
+			document.getElementById("mouse_lat").innerHTML = e.latlng.lat.toFixed(5)
+		})
+
+		map.on('move', function (e) {
+			/* console.log(e.target) */
+			document.getElementById("center_lng").innerHTML = map.getCenter().lng.toFixed(5)
+			document.getElementById("center_lat").innerHTML = map.getCenter().lat.toFixed(5)
+		})
+
 		//设置天地图的电子地图数据的来源。
 		var normalm = L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {
 			maxZoom: 18,
@@ -294,11 +319,12 @@
 
 		L.control.layers(baseLayers, myLayers).addTo(map);
 		map.on('zoomend', function (e) {
-			if (map.getZoom() >= 17) {
+			document.getElementById("level").innerHTML = map.getZoom()
+			if (map.getZoom() >= 16) {
 				var a = document.getElementsByClassName("leaflet-marker-icon label leaflet-zoom-animated leaflet-clickable")
 				for (i = 0; i < a.length; i++) {
 					a[i].style.visibility = "visible";
-					a[i].style.fontSize = (map.getZoom() - 16) * 7.5 + "px";
+					a[i].style.fontSize = (map.getZoom() - 15) * 5.5 + "px";
 				}
 			}
 			else {
@@ -316,102 +342,150 @@
 			switch (feature.properties.Type) {
 				case '主干道':
 					return {
-						color: "RGB(97,153,0)",
-						opacity: 1,
+						fillColor: "RGB(97,153,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '体育设施':
 					return {
-						color: "RGB(146,186,0)",
-						opacity: 1,
+						fillColor: "RGB(146,186,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '公共服务设施':
 					return {
-						color: "RGB(255,255,115)",
-						opacity: 1,
+						fillColor: "RGB(255,255,115)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '公路':
 					return {
-						color: "RGB(197,219,0)",
-						opacity: 1,
+						fillColor: "RGB(197,219,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '办公楼':
 					return {
-						color: "RGB(255,217,0)",
-						opacity: 1,
+						fillColor: "RGB(255,217,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '宿舍楼':
 					return {
-						color: "RGB(255,174,0)",
-						opacity: 1,
+						fillColor: "RGB(255,174,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '教学设施':
 					return {
-						color: "RGB(255,132,0)",
-						opacity: 1,
+						fillColor: "RGB(255,132,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '未建设用地':
 					return {
-						color: "RGB(115,115,0)",
-						opacity: 1,
+						fillColor: "RGB(115,115,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '次级道路及广场':
 					return {
-						color: "RGB(255,255,0)",
-						opacity: 1,
+						fillColor: "RGB(255,255,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '水体':
 					return {
-						color: "RGB(115,178,255)",
-						opacity: 1,
+						fillColor: "RGB(115,178,255)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 				case '草地':
 					return {
-						color: "RGB(76,230,0)",
-						opacity: 1,
+						fillColor: "RGB(76,230,0)",
+						fillOpacity: 1,
+						color: "black",
+						weight: 1,
+						stroke: true
 					};
 					break;
 			}
 		}
 
 		function styleFunction2(feature) {
-			if (0 < feature.properties.peoplelive && feature.properties.peoplelive < 131) {
+			if (0 <= feature.properties.peoplelive && feature.properties.peoplelive < 131) {
 				return {
-					color: "RGB(40,146,199)",
-					opacity: 1,
+					fillColor: "RGB(40,146,199)",
+					fillOpacity: 1,
+					color: "black",
+					weight: 1,
+					stroke: true
 				};
 			}
-			if (131 < feature.properties.peoplelive && feature.properties.peoplelive < 344) {
+			if (131 <= feature.properties.peoplelive && feature.properties.peoplelive < 344) {
 				return {
-					color: "RGB(160,194,155)",
-					opacity: 1,
+					fillColor: "RGB(160,194,155)",
+					fillOpacity: 1,
+					color: "black",
+					weight: 1,
+					stroke: true
 				};
 			}
-			if (344 < feature.properties.peoplelive && feature.properties.peoplelive < 444) {
+			if (344 <= feature.properties.peoplelive && feature.properties.peoplelive < 444) {
 				return {
-					color: "RGB(250,250,100)",
-					opacity: 1,
+					fillColor: "RGB(250,250,100)",
+					fillOpacity: 1,
+					color: "black",
+					weight: 1,
+					stroke: true
 				};
 			}
-			if (444 < feature.properties.peoplelive && feature.properties.peoplelive < 575) {
+			if (444 <= feature.properties.peoplelive && feature.properties.peoplelive < 575) {
 				return {
-					color: "RGB(250,141,52)",
-					opacity: 1,
+					fillColor: "RGB(250,141,52)",
+					fillOpacity: 1,
+					color: "black",
+					weight: 1,
+					stroke: true
 				};
 			}
-			if (575 < feature.properties.peoplelive && feature.properties.peoplelive < 846) {
+			if (575 <= feature.properties.peoplelive && feature.properties.peoplelive <= 846) {
 				return {
-					color: "RGB(232,16,20)",
-					opacity: 1,
+					fillColor: "RGB(232,16,20)",
+					fillOpacity: 1,
+					color: "black",
+					weight: 1,
+					stroke: true
 				};
 			}
 		}
