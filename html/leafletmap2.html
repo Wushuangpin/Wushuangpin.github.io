@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" type="text/css" href="./leaflet/leaflet.css" />
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="./leaflet/leaflet.js"></script>
+		<script src="./js/leaflet.ChineseTmsProviders.js"></script>
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.72.0/dist/L.Control.Locate.min.css" />
+		<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.72.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+		<style>
+			html,
+		body,
+		#map {
+			height: 100%;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+		}
+
+		.cardWrapper {
+			display: none;
+			position: absolute;
+			width: 100%;
+			/* height: 100%; */
+			border-top-left-radius: 15px;
+			border-top-right-radius: 15px;
+			background-color: #FFFFFF;
+			box-shadow: -1px -1px 2px 0px #F1F1F1, 1px -1px 2px 0px #F1F1F1;
+			bottom: 0;
+			left: 0
+		}
+
+		.vLine {
+			border-left: solid 2px #616161;
+			height: 15px;
+			vertical-align: middle;
+			display: inline-block;
+			margin: 2px;
+		}
+
+		.cardItem {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+			margin-top: 5px;
+		}
+
+		.alertIcon {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+		}
+
+		.fontColorGrey {
+			color: #616161;
+		}
+
+		.title {
+			color: #27A176;
+			font-size: 20px;
+		}
+
+		.cardItem span {
+			margin: 0 10px;
+		}
+
+		.binStatus {
+			display: flex;
+			justify-content: space-between;
+			padding: 0 10px;
+			/* width: 100%; */
+		}
+
+		/* 按钮 */
+		.btnGroup {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-around;
+			margin: 20px 20px 20px 20px;
+		}
+
+		.btnDiv {
+			padding: 10px 60px;
+			color: white;
+			border-radius: 10px;
+			background-color: #28A375;
+		}
+
+		.nav {
+			/* 			padding: 10px 30px;
+				color: white; */
+			margin-right: 10px;
+		}
+	</style>
+		<title>地图</title>
+	</head>
+
+	<body>
+		<div id="map"></div>
+		<div class="cardWrapper" id="card">
+			<div id="" style="border-bottom: 1.5px solid rgb(242, 242, 242);padding: 10px 0;width: 100%;">
+				<div id="" class="cardItem">
+					<span class="title" id="title">暂无信息</span>
+				</div>
+				<div class="cardItem fontColorGrey">
+					<span id="distance">暂无信息</span>
+					<!-- 分割线 -->
+					<div id="" class="vLine"></div>
+					<span id="province">暂无信息</span>
+					<span id="city">暂无信息</span>
+				</div>
+				<div class="cardItem fontColorGrey">
+					<span>每天6:00 - 9:00</span>
+					<!-- 分割线 -->
+					<div id="" class="vLine"></div>
+					<span id="deviceId">暂无信息</span>
+				</div>
+				<div class="cardItem binStatus">
+					<div id="">
+						<img src="../../static/map/normal.png" style="height: 30px;width: auto;">
+						<!-- <img src="../../static/public/harm-color.png" style="width: 20px;height: 20px;" width="20" height="20" /> -->
+						<!-- 分割线 -->
+						<span class="binStatusTitle" id="binStatusTitle0">正常设备</span>
+					</div>
+					<div id="">
+						<img src="../../static/map/error.png" style="height: 30px;width: auto;">
+						<!-- 分割线 -->
+						<span class="binStatusTitle" id="binStatusTitle1">故障设备</span>
+					</div>
+					<div id="">
+						<img src="../../static/map/warning.png" style="height: 30px;width: auto;">
+						<!-- 分割线 -->
+						<span class="binStatusTitle" id="binStatusTitle2">报警设备</span>
+					</div>
+				</div>
+				<div id="alert" class="alertIcon">
+					<svg t="1588939540752" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3245"
+					 width="32" height="32">
+						<path d="M543.082667 161.173333a64 64 0 0 1 24.853333 24.853334l317.909333 572.224A64 64 0 0 1 829.866667 853.333333H194.133333a64 64 0 0 1-55.957333-95.082666L456.064 186.026667a64 64 0 0 1 87.018667-24.853334zM544 661.333333h-64v64h64v-64z m0-276.437333h-64V618.666667h64V384.896z"
+						 fill="#E13D37" p-id="3246"></path>
+					</svg>
+				</div>
+			</div>
+			<div id="" class="btnGroup">
+				<div class="btnDiv nav">
+					<span id="">
+						导航
+					</span>
+				</div>
+				<div id="detail" class="btnDiv">
+					<span id="">
+						详情
+					</span>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+	<script type="text/javascript">
+		window.navigator.geolocation.getCurrentPosition(succCB, errCB);
+		function succCB(pos) {
+			console.log('经度:' + pos.coords.longitude);
+			console.log('纬度:' + pos.coords.latitude);
+
+			let lon = pos.coords.longitude
+			let lat = pos.coords.latitude
+			const goTo = function(url, data) {
+				const urlIs = "/pages/components/funcModel/equipment/equipDetails" + (url.indexOf('?') < 0 ? '?' : '&') + param(
+					data)
+				uni.navigateTo({
+					url: urlIs
+				})
+			}
+
+			function param(data) {
+				let url = ''
+				// encodeURIComponent(
+				for (var j in data) {
+					let value = data[j] !== undefined ? data[j] : ''
+					url += '&' + j + '=' + JSON.stringify(value)
+				}
+				return url ? url.substring(1) : ''
+			}
+			document.getElementById('detail').addEventListener('click', function() {
+				goTo("equipDetails", data0[selectitem])
+			});
+
+			var selectitem
+			var latlng = L.latLng(lat, lon);
+
+			var data0 = (function() {
+				let area = ""
+				let customerId = "1ea8a84504114a085b91333fd7e9311"
+				let status = "all"
+				var result;
+				$.ajax({
+					type: 'get',
+					url: 'http://39.101.213.6:13018/api/DeviceGlanceController/getDevicePreviewList?area=' + area +
+						'&customerId=' + customerId + '&status=' + status,
+					dataType: 'json',
+					async: false,
+					success: function(data) {
+						result = data;
+					}
+				});
+				return result;
+			})();
+
+
+			var data = []
+			for (i in data0) {
+				data[i] = new Object()
+				if (data0[i].status == "alarm") {
+					data[i].type = "报警设备"
+					data[i].iconUrl = "../../static/map/warning.png"
+					data[i].selecticon = "../../static/map/warning-selected.png"
+				}
+
+				if (data0[i].status == "fault") {
+					data[i].type = "故障设备"
+					data[i].iconUrl = "../../static/map/error.png"
+					data[i].selecticon = "../../static/map/error-selected.png"
+				}
+
+				if (data0[i].status == "normal") {
+					data[i].type = "正常设备"
+					data[i].iconUrl = "../../static/map/normal.png"
+					data[i].selecticon = "../../static/map/nromal-selected.png"
+				}
+				data[i].deviceId = data0[i].deviceId
+				data[i].name = data0[i].deviceName
+				data[i].status = data0[i].status
+				data[i].province = data0[i].province
+				data[i].area = data0[i].area
+				data[i].city = data0[i].city
+				data[i].location = [data0[i].gpslocx, data0[i].gpslocy]
+				data[i].distance = latlng.distanceTo(L.latLng(data0[i].gpslocx, data0[i].gpslocy));
+			}
+
+			var map = L.map('map', {
+				//center: [26.10, 119.30],
+				center: [lat, lon],
+				zoom: 12,
+				attributionControl: false
+			});
+
+			var lc = L.control.locate({
+				strings: {
+					title: "Show me where I am, yo!"
+				}
+			}).addTo(map);
+			lc.start();
+
+
+			//设置天地图的电子地图数据的来源。
+			var normalm = L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {
+				maxZoom: 18,
+				minZoom: 5
+			});
+
+			var normala = L.tileLayer.chinaProvider('TianDiTu.Normal.Annotion', {
+				maxZoom: 18,
+				minZoom: 5
+			});
+
+			var imgm = L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {
+				maxZoom: 18,
+				minZoom: 5
+			});
+
+			var imga = L.tileLayer.chinaProvider('TianDiTu.Satellite.Annotion', {
+				maxZoom: 18,
+				minZoom: 5
+			});
+
+			//创建天地图电子地图的图层组，将电子地图与注记图层组合，形成电子地图图层组
+			var normal = L.layerGroup([normalm, normala]);
+			//创建天地图影像地图的图层组，将影像地图与注记图层组合，形成影像地图图层组
+			var image = L.layerGroup([imgm, imga]);
+			map.addLayer(normal);
+			var baseLayers = {
+				"地图": normal,
+				"影像": image
+			}
+
+			var marks = []
+			var selectmark = []
+			for (i in data) {
+				var mark = L.marker([data[i].location[0], data[i].location[1]], {
+					icon: L.icon({
+						iconUrl: data[i].iconUrl,
+						iconSize: [30, 30],
+					})
+				});
+
+				mark.on('click', select(data[i]))
+				marks[i] = mark
+			}
+			var SMarker
+
+			function select(args) {
+				return function(e) {
+					map.panTo(args.location)
+
+					for (var i = 0; i < data0.length; i++) {
+						if (data0[i].deviceName == args.name) {
+							selectitem = i
+						}
+					}
+
+					document.getElementById("card").style.display = 'block'
+					document.getElementById("title").innerHTML = args.province + args.city + args.area
+					document.getElementById("distance").innerHTML = ((args.distance) / 1000.0).toFixed(2) + "千米"
+					document.getElementById("province").innerHTML = args.province
+					document.getElementById("city").innerHTML = args.city
+					document.getElementById("deviceId").innerHTML = args.deviceId
+					if (args.status == "alarm" || args.status == "err") {
+						document.getElementById("alert").style.display = 'block'
+					} else {
+						document.getElementById("alert").style.display = 'none'
+					}
+
+					if (selectmark.length != 0) {
+						SMarker.clearLayers();
+					}
+					var mark = L.marker([args.location[0], args.location[1]], {
+						icon: L.icon({
+							iconUrl: args.selecticon,
+							iconSize: [30, 30],
+						})
+					});
+					selectmark[0] = mark
+					SMarker = L.layerGroup(selectmark);
+					map.addLayer(SMarker);
+				}
+			}
+			map.on('click', function(e) {
+				if (selectmark.length != 0) {
+					SMarker.clearLayers();
+				}
+				document.getElementById("card").style.display = 'none'
+			})
+
+			//将上面三个田径场标记，组成图层组。
+			var Markers = L.layerGroup(marks);
+
+
+			var myLayers = {
+				"设备": Markers,
+			};
+			map.addLayer(Markers);
+
+
+			L.control.layers(baseLayers, myLayers).addTo(map);
+		}
+
+		function errCB(err) {
+			console.log('获取定位信息失败');
+			console.log('错误编号:' + err.code);
+			console.log('错误消息:' + err.message);
+		}
+	</script>
+</html>
