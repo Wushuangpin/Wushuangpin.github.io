@@ -1,97 +1,108 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html class="x-admin-sm">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>GIS应用开发方法实验二</title>
-    <link rel="icon" type="image/x-icon" href="/images/title.ico" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <style>
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <title>三维虚拟城市化工事故管理系统</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
 </head>
 
-<body>
-    <iframe src="navbar.html" style="display:block;width: 100%;height:70px;" frameborder="0"></iframe>
-    <hr style="margin-top: 2px;margin-bottom: 2px;border-top: 2px solid rgb(226, 240, 243);">
-    <ul class="nav nav-pills nav-stacked sidebar">
-        <li role="presentation" id="bar-10">
-            <a href="#docCollapse10" class="nav-header collapsed" data-toggle="collapse" id="collapseParent"><span
-                    class="	glyphicon glyphicon-globe" style="color: black;margin-right: 5px;"></span>加载地图服务<span
-                    class="pull-right glyphicon glyphicon-chevron-down"></span></a>
-            <ul id="docCollapse10" class="nav nav-list collapse">
-                <li><a name="/one/indexTianDiTu.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-flash" style="color: black;margin-right: 5px;"></span>天地图</a>
-                </li>
-                <li><a name="/one/indexArcGIS.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-bell" style="color: black;margin-right: 5px;"></span>ArcGIS在线</a>
-                </li>
-                <li><a name="/one/indexGaoDe.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-map-marker" style="color: black;margin-right: 5px;"></span>高德</a>
-                </li>
-                <li><a name="/one/indexGeoq.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-leaf" style="color: black;margin-right: 5px;"></span>智图</a></li>
-                <li><a name="/one/indexGoogle.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-adjust" style="color: black;margin-right: 5px;"></span>谷歌</a>
-                </li>
-                <li><a name="/one/indexOSM.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-facetime-video"
-                            style="color: black;margin-right: 5px;"></span>OSM</a></li>
-                <li><a name="/one/indexBaidu.html" onclick=change(this.name) href="javascript:void(0)"><span
-                            class="glyphicon glyphicon-fire" style="color: black;margin-right: 5px;"></span>百度</a>
+<body class="index">
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo">
+            <a style="width:auto"><img src="./images/logo.png"
+                    style="height: 30px;width: auto;margin-right:1rem">多维指标返贫脆弱性计算平台</a>
+            <!-- <a></a> -->
+        </div>
+        <div class="left_open">
+            <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
+        </div>
+
+        <ul class="layui-nav right" lay-filter="">
+            <li class="layui-nav-item">
+                <a href="javascript:;">管理员：admin
+                    <span id="admin_name"></span>
+                </a>
+                <dl class="layui-nav-child">
+                    <!-- 二级菜单 -->
+                    <dd>
+                        <a onclick="xadmin.open('个人信息','php/admininfo.php')">个人信息</a>
+                    </dd>
+                    <dd>
+                        <a href="./login.html">退出</a>
+                    </dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item to-index">
+                <a href="http://localhost:8090">相关信息页面</a>
+            </li>
+        </ul>
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+    <!-- 左侧菜单开始 -->
+    <div class="left-nav">
+        <div id="side-nav">
+            <ul id="nav">
+                <li>
+                    <a href="javascript:;">
+                        <i class="iconfont left-nav-li" lay-tips="用户信息管理">&#xe6b8;</i>
+                        <cite>多维度指标脆弱性计算</cite>
+                        <i class="iconfont nav_right">&#xe697;</i></a>
+                    <ul class="sub-menu">
+                        <li>
+                            <a onclick="xadmin.add_tab('指标说明','./src/index_des.html')">
+                                <i class="iconfont">&#xe6a7;</i>
+                                <cite>指标说明</cite></a>
+                        </li>
+                        <li>
+                            <a onclick="xadmin.add_tab('表格计算','./src/table.html')">
+                                <i class="iconfont">&#xe6a7;</i>
+                                <cite>表格计算</cite></a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
-        </li>
-        <li role="presentation" id="bar-1"><a name="/two/index.html" onclick=change(this.name)
-                href="javascript:void(0)"><span class="	glyphicon glyphicon-th"
-                    style="color: black;margin-right: 5px;"></span>加载离线数据图层</a></li>
-        <li role="presentation" id="bar-1"><a name="/three/index.html" onclick=change(this.name)
-                href="javascript:void(0)"><span class="glyphicon glyphicon-picture"
-                    style="color: black;margin-right: 5px;"></span>自定义信息显示模块</a></li>
-        <li role="presentation" id="bar-1"><a name="/four/index.html" onclick=change(this.name)
-                href="javascript:void(0)"><span class="glyphicon glyphicon-picture"
-                    style="color: black;margin-right: 5px;"></span>坐标转换工具</a></li>
-    </ul>
-    <div class="v-line"></div>
-    <iframe id="iframe" src="/two/index.html" frameborder="0"></iframe>
+        </div>
+    </div>
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+            <ul class="layui-tab-title">
+                <li class="home">
+                    <i class="layui-icon">&#xe68e;</i>计算体系说明
+                </li>
+            </ul>
+            <div class="layui-unselect layui-form-select layui-form-selected" id="tab_right">
+                <dl>
+                    <dd data-type="this">关闭当前</dd>
+                    <dd data-type="other">关闭其它</dd>
+                    <dd data-type="all">关闭全部</dd>
+                </dl>
+            </div>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <iframe src='src/description.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+                </div>
+            </div>
+            <div id="tab_show"></div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <style id="theme_style"></style>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
 </body>
-<script>
-    function change(url) {
-        document.getElementById("iframe").src = url
-    }
-</script>
-<style>
-    .sidebar {
-        background: rgb(226, 240, 243);
-        width: 11.5%;
-        height: calc(100% - 76px);
-        float: left;
-    }
-
-    .v-line {
-        float: left;
-        margin-left: 0.15%;
-        margin-right: 0.15%;
-        width: 0.15%;
-        height: calc(100% - 76px);
-        background: rgb(226, 240, 243);
-    }
-
-    #iframe {
-        display: block;
-        width: 88.05%;
-        height: calc(100% - 76px);
-    }
-</style>
 
 </html>

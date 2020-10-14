@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <title>验证界面</title>
+  <link rel="stylesheet" href="/css/bootstrap0.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/animate.min.css">
+  <link rel="stylesheet" href="//cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    #myCarousel {
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
+    <ol class="carousel-indicators">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+      <div class="item active">
+        <img src="/images/bg3.jpg" style="width:100vw;height:100vh">
+      </div>
+      <div class="item">
+        <img src="/images/bg2.jpg" style="width:100vw;height:100vh">
+      </div>
+      <div class="item">
+        <img src="/images/bg4.jpg" style="width:100vw;height:100vh">
+      </div>
+    </div>
+  </div>
+
+  <div class="login">
+    <div class="login-wrap">
+      <img class="avatar" src="images/admin_default.jpg">
+      <div id="message" class="alert alert-danger" style="color: green;background-color: aliceblue;border-color: green;display:none">
+        <strong id="text"></strong>
+      </div>
+      <div id="errmessage" class="alert alert-danger" style="display:none">
+        <strong id="errtext"></strong>
+      </div>
+      <div id="reg_text">
+        <div class="form-group" style="display: flex;">
+          <input id="email" name="email" value="" type="email" class="form-control" placeholder="请输入注册邮箱" autofocus>
+          <button id="sendNewEmail" type="button" class="btn btn-primary btn-block" style="margin-left:10px;width:auto" onclick="postmessage()">发送验证码</button>
+        </div>
+        <div class="form-group">
+          <input id="code" name="code" type="code" class="form-control" placeholder="请输入验证码">
+        </div>
+        <div class="form-group">
+          <input id="password" name="password" type="password" class="form-control" placeholder="请输入新密码">
+        </div>
+        <div class="form-group">
+          <input id="password2" name="password2" type="password" class="form-control" placeholder="再次输入新密码">
+        </div>
+        <div class="btn btn-prim ary btn-block" style="background-color:darkgoldenrod;color:white" onclick="resetpw()">提交</div>
+      </div>
+      <a style="float:right;margin-top:10px" href="login.html">返回登录</a>
+    </div>
+  </div>
+  <script>
+    function postmessage() {
+      if (document.getElementById("email").value == "") {
+        alert("请输入邮箱")
+      } else {
+        var $sendNewEmail = $("#sendNewEmail");
+
+        time($sendNewEmail, 60);
+
+        function time(o, wait) {
+          var $this = $(o);
+          if (wait == 0) {
+            $this.css('pointer-events', '');
+            $this.css("background", "#549ff2");
+            $this.html("发送验证码");
+            wait = 60;
+          } else {
+            $this.css("pointer-events", "none");
+            $this.css("background", "#999999");
+            $this.html("重新发送(" + wait + ")");
+            wait--;
+            setTimeout(function() {
+                time(o, wait)
+              },
+              1000)
+          }
+        }
+        $.ajax({
+          type: 'get',
+          url: 'http://49.234.65.18:2001/admin/sendCode?email=' + document.getElementById("email").value,
+          dataType: 'json',
+          async: false,
+          success: function(res) {
+            console.log(res)
+          }
+        });
+
+      }
+    }
+
+    function resetpw() {
+
+      email = document.getElementById("email").value
+      newPassword = document.getElementById("password").value
+      code = document.getElementById("code").value
+
+      $.ajax({
+        type: 'post',
+        url: `http://49.234.65.18:2001/admin/changePassword?email=${email}&newPassword=${newPassword}&code=${code}`,
+        //dataType: 'json', 
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        success: function(res) {
+          console.log(res)
+          if (res.code == 200) {
+            document.getElementById("message").style.display = "block"
+            document.getElementById("errmessage").style.display = "none"
+            document.getElementById("reg_text").style.display = "none"
+            document.getElementById("text").innerText = "修改密码成功！"
+          }
+          if (res.code == 400) {
+            document.getElementById("errmessage").style.display = "block"
+            document.getElementById("errtext").innerText = "错误：" + res.message
+          }
+
+        },
+        error: function(res) {
+          console.log(res)
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
