@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>问题设备选择</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    
+    <div id="map"></div>
+    <div class="cardWrapper" id="showCard"></div>
+
+    <script type="text/javascript">
+      document.write('<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"><\/script>');
+    </script>
+    <!-- uni 的 SDK -->
+    <script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+    <script type="text/javascript">
+
+
+      // 拿到数据值
+      var equipData = {
+        "type": "FeatureCollection",
+				"features": []
+			},
+			equip,
+			mapObj;
+			// 加载地图
+			var map = ""
+
+      function showMap(lon,lat){
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic3VueWluZ2p1biIsImEiOiJja2JmNjJwdDcwc2owMnpvaWdhazJyMTAyIn0.P0FMxWjlAf2YJnoXm61lgw';
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v10',
+            zoom: 14,
+            // lon=119.318580&lat=26.034681'
+            // center:[119.299968,26.035586],
+            // center: [119.31852, 26.034602],
+            center: [lon, lat],  
+            minZoom: 3
+        });
+
+        // 语言
+				// var language = new MapboxLanguage();
+        // map.addControl(language);
+        
+				// 定位
+				var geolocate = new mapboxgl.GeolocateControl({
+					positionOptions: {
+						enableHighAccuracy: true
+					},
+					trackUserLocation: true,
+					showUserLocation: true,
+					showAccuracyCircle: true,
+
+				});
+				map.addControl(geolocate);
+				// 获取位置参数
+				var options = {
+					enableHighAccuracy: true,
+					timeout: 5000,
+					maximumAge: 0
+				};
+				// 获取当前位置成功or失败
+				function success(pos) {
+          let crd = pos.coords;
+					lon = crd.longitude;
+					lat = crd.latitude;
+					// getList(lon,lat)
+				}
+
+				function error(err) {
+					document.addEventListener('UniAppJSBridgeReady', function() {
+            // plus.nativeUI.toast("获取定位失败，请打开GPS");
+            console.log("获取定位失败，请打开GPS");
+					})
+					console.warn(`ERROR(${err.code}): ${err.message}`);
+				}
+        navigator.geolocation.getCurrentPosition(success, error, options);
+        
+        console.log("map:",map);
+
+				return map
+      }
+
+      function getList(lon, lat) {
+				$.ajax({
+					// url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude=26.034602&longitude=119.31852',
+					// url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude='+ lat +'&longitude='+ lon,119.31852, 26.034602
+					url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude=' + lat +
+						'&longitude=' + lon,
+					type: 'GET',
+					async: false,
+					contentType: 'application/json;charset=utf-8',
+					success: function(data) {
+            console.log("data:",data);
+						if (data.length != 0) {
+							equipData.features = data
+							// console.log(JSON.stringify(equipData.features))
+							equipData.features.forEach(item => {
+								var name = "iconSize",
+									value = [30, 35],
+									disName = "distance",
+									iconName = 'icon',
+									icon = 'harbor';
+								item.properties[name] = value
+								item.properties[disName] = ""
+								item.properties[iconName] = icon
+              })
+              console.log("equipData.features:",equipData.features);
+
+              // showMap(lon,lat);
+              
+              // 注掉的是这个
+              showPoint(lon, lat, showMap(lon, lat), equipData)
+              
+							// return equipData.features
+						} else {
+							showMap(lon, lat)
+              // plus.nativeUI.toast("附近暂无可选设备，问题位置须手动填写")
+              console.log("附近暂无可选设备，问题位置须手动填写");
+
+              document.getElementById('showCard').style.display = 'none'
+              
+							// return ;
+						}
+					}
+				})
+				// console.log(JSON.stringify(equipData.features))
+			}
+
+      function showPoint(lon, lat, map, equipData) {
+				var currentId,
+					navlon,
+					navlat,
+					address,
+					recbinId,
+					distance;
+				map.on('load', function() {
+					//为地图样式添加数据源
+					map.addSource('places', {
+						type: 'geojson',
+						data: equipData,
+					});
+					map.addLayer({
+						"id": 'unclustered-point',
+						"type": 'symbol',
+						"source": 'places',
+						'layout': {
+							'icon-image': '{icon}-15',
+							'icon-allow-overlap': true
+						}
+					});
+					// 显示卡片
+					map.on('click', 'unclustered-point', function(e) {
+						for (let i in e.features[0].properties) {
+							if (document.getElementById(i)) {
+								// 计算当前距离
+								if(i == 'deviceId') {
+									let tempId = ''
+									if (currentId) {
+										currentId.style.backgroundImage =
+											"url('./img/unequip.png')";
+									}
+									tempId = document.getElementById(e.features[0].properties[i])
+					
+									tempId.style.backgroundImage =
+										"url('./img/equip.png')";
+									currentId = tempId
+								} else {
+									document.getElementById(i).innerText = e.features[0].properties[i]
+								}
+							}
+							address = e.features[0].properties['address']
+							recbinId = e.features[0].properties['deviceId']
+						}
+						navlon = e.lngLat.lng
+						navlat = e.lngLat.lat		
+					})
+					// 创建列表
+					var list = document.createElement('ul');
+					list.id = 'list';
+					document.getElementById("showCard").appendChild(list);
+					list.id = 'list';
+					equipData.features.forEach((item, index) => {
+						var listItem = document.createElement('li')
+						document.getElementById('list').appendChild(listItem)
+						listItem.id = "listItem" + index
+						// 名称
+						var h4 = document.createElement('h4')
+						document.getElementById('listItem' + index).appendChild(h4)
+						h4.id = "devName" + index
+						h4.innerText = item.properties.deviceName
+						// 地址
+						var p = document.createElement('p')
+						document.getElementById('listItem' + index).appendChild(p)
+						p.id = "address" + index
+						p.innerText = item.properties.address
+						p.style.marginRight = '40px'
+						// jiantou
+						var span = document.createElement('span')
+						document.getElementById('listItem' + index).appendChild(span)
+						span.className = "iconfont iconxuanzhong arrowRight"
+						span.style.visibility = 'hidden';
+						span.id = "arrowRight" + index
+						// 未选中默认为空 先注释掉
+						// plus.storage.setItem('address', "")
+						// 点击选中
+						document.getElementById("listItem" + index).addEventListener('click', function(res) {
+							// 选择完成
+							var aaa = document.getElementsByClassName("arrowRight")
+							// console.log(aaa.length)
+							for (let i = 0; i < aaa.length; i++) {
+								document.getElementById("arrowRight" + i).style.visibility = 'hidden'
+								document.getElementById(equipData.features[i].properties.deviceId).style.backgroundImage =
+									"url('./img/unequip.png')";
+							}
+							document.getElementById("arrowRight" + index).style.visibility = 'visible';
+              document.getElementById(item.properties.deviceId).style.backgroundImage = "url('./img/equip.png')";
+              先注释掉
+							// plus.storage.setItem('address', item.properties.address)
+						})
+						var name = "iconSize",
+							value = [30, 35],
+							disName = "distance",
+							iconName = 'icon',
+							icon = 'art-gallery';
+						item.properties[name] = value
+						item.properties[disName] = ""
+						item.properties[iconName] = icon
+					})
+					equipData.features.forEach(function(marker) {
+						// create a DOM element for the marker
+						equip = document.createElement('div');
+						equip.className = 'marker';
+						equip.id = marker.properties.deviceId
+						equip.style.backgroundImage =
+							"url('./img/unequip.png')";
+						equip.style.width = marker.properties.iconSize[0] + 'px';
+						equip.style.height = marker.properties.iconSize[1] + 'px';
+						// add marker to map
+						new mapboxgl.Marker(equip)
+							.setLngLat(marker.geometry.coordinates)
+							.addTo(map);
+					});
+				})
+			}
+
+      // 待触发 `UniAppJSBridgeReady` 事件后，即可调用 uni 的 API。
+      document.addEventListener('UniAppJSBridgeReady', function() {
+        uni.postMessage({
+            data: {
+                action: 'message'
+            }
+        });
+        // uni.getEnv(function(res) {
+        //     console.log('当前环境：' + JSON.stringify(res));
+        // });
+
+        getList(119.318580,26.034681);
+        // showMap(119.318580,26.034681);
+
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <title>点击下载应用</title>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+      white-space: normal;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .weixin-tip {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      filter: alpha(opacity=80);
+      height: 100%;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .weixin-tip p {
+      text-align: center;
+      margin-top: 10%;
+      padding: 0 5%;
+    }
+  </style>
+</head>
+<!-- display:flex;flex-direction: column;align-items: center;justify-content: center; -->
+
+<!-- <body style="display:flex;flex-direction: column;align-items: center;justify-content: center;"> -->
+
+<body>
+  <!-- <div class="" style="width:95%;top:30%;text-align: center;position: absolute;translateX:(-50%);">
+    <div style="word-wrap:break-word;">
+      <p>如不能访问请手动复制以下地址并粘贴至浏览器访问：</p>
+    </div>
+    <div style="font-size: 20px;">
+      <textarea id="url" value=""
+        style="width:300px;height: 50px;word-wrap:break-word;">http://218.5.37.165:5000/apk_download/workBeeDeliApp.apk</textarea>
+    </div>
+    <div style="word-wrap:break-word;font-size: 20px;">
+      <button
+        style="margin:10px 50px;background-color: green;border-radius:5px;color: white;border:none;padding:5px 30px"
+        onClick="copyUrl()">复制地址</button>
+    </div>
+
+  </div> -->
+  <div class="weixin-tip">
+    <p>
+      <img src="http://218.5.37.165:5000/apk_download/openUrl/live_weixin.png" alt="点击右上角按钮，选择在浏览器中打开">
+    </p>
+  </div>
+  <script type="text/javascript">
+    $(window).on("load", function () {
+      var winHeight = $(window).height();
+      function is_weixin() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      var isWeixin = is_weixin();
+      if (isWeixin) {
+        // window.location.href = "http://218.5.37.165:5000/apk_download/workBeeDeliApp.apk"
+        $(".weixin-tip").css("height", winHeight);
+        $(".weixin-tip").show();
+      } else {
+        window.location.replace("http://218.5.37.165:5000/apk_download/workBeeDeliApp.apk")
+        // window.location.href = "http://218.5.37.165:5000/apk_download/workBeeDeliApp.apk"
+      }
+    })
+
+    // function copyUrl() {
+    //   var ele = document.getElementById("url");
+    //   ele.select();
+    //   document.execCommand("Copy");
+    //   alert("复制链接成功！");
+    // }
+  </script>
+</body>
+
+</html>

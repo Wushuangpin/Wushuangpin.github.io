@@ -1,0 +1,248 @@
+#div1 {
+  margin-bottom: 0;
+  background-image: url(/images/backgroundimg.jpg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  -moz-background-size: 100% 100%;
+  text-align: center;
+  line-height: 65px;
+  vertical-align: middle;
+}
+
+#foot {
+  margin-bottom: 0;
+  background-image: url(/images/foot.jpg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  -moz-background-size: 100% 100%;
+  text-align: center;
+  line-height: 80px;
+  vertical-align: middle;
+}
+
+#span1 {
+  font-family: STKaiti;
+  font-size: 45px;
+}
+
+#span2 {
+  font-family: FZShuTi;
+  font-size: 35px;
+  color: rgb(224, 237, 238);
+}
+
+.div2 {
+  float: left;
+  margin-left: 2%;
+}
+
+.span {
+  margin-left: 0;
+  font-size: 25px;
+  width: 300px;
+  text-align: center
+}
+
+.imgs {
+  width: 300px;
+  height: 200px;
+}
+
+.imgs img {
+  margin-right: 11px;
+  width: 290px;
+  height: 190px;
+  box-shadow: 7px 7px 3px #888888;
+  border: 4px solid white;
+  border-radius: 25px
+}
+
+#pic {
+  margin-right: 11px;
+  width: 200px;
+  height: 130px;
+  box-shadow: 7px 7px 3px #888888;
+  border: 4px solid white;
+  border-radius: 25px
+}
+
+#info {
+  width: 200px;
+  height: 130px;
+}
+
+.circle {
+  margin: 10px auto;
+}
+
+.circle img {
+  border-radius: 50%;
+  width: 300px;
+  height: 200px;
+  box-shadow: 10px 10px 5px #888888;
+  border: 4px solid white;
+}
+
+.p {
+  font-size: 12px;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+
+.p1 {
+  text-align: center;
+  font-size: 16px;
+}
+
+.p2 {
+  padding: 5px 10px 25px 10px;
+  width: 200px;
+  text-align: left;
+}
+
+#button1 {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0px;
+  vertical-align: middle;
+  line-height: 22px;
+  margin: 0px;
+  Height: 25px;
+  Width: 75px;
+}
+
+#button2 {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0;
+  vertical-align: middle;
+  line-height: 22px;
+  Height: 25px;
+  Width: 50px;
+}
+
+#e1 {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0px;
+  vertical-align: middle;
+  line-height: 22px;
+  Height: 25px;
+  Width: 70px;
+}
+
+#sp {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0px;
+  vertical-align: middle;
+  line-height: 22px;
+  Height: 25px;
+  Width: 70px;
+}
+
+#sp3 {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0px;
+  vertical-align: middle;
+  line-height: 22px;
+  Height: 34px;
+  Width: 70px;
+}
+
+#sp2 {
+  float: right;
+  font-size: 15px;
+  text-align: center;
+  padding: 0px;
+  vertical-align: middle;
+  line-height: 22px;
+  Height: 34px;
+  Width: 50px;
+}
+
+#sp1 {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  border-spacing: 0;
+  border-collapse: collapse;
+  box-sizing: border-box;
+  margin: 0;
+  font: inherit;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 15px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.fakeimg {
+  height: 200px;
+  background: #aaa;
+}
+
+.fakeimg {
+  height: 200px;
+  background: #aaa;
+}
+
+html {
+  height: 100%
+}
+
+body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px
+}
+
+#allmap {
+  height: 87.5%;
+}
+
+#span1 {
+  font-family: STKaiti;
+  font-size: 45px;
+}
+
+.anchorBL {
+  display: none
+}
+
+.container label {
+  max-width: none;
+}
+
+::-webkit-scrollbar {
+  /*滚动条整体样式*/
+  width: 10px;
+  /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+}
+
+::-webkit-scrollbar-thumb {
+  /*滚动条里面小方块*/
+  border-radius: 10px;
+  background-color: skyblue;
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+}
+
+::-webkit-scrollbar-track {
+  /*滚动条里面轨道*/
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #ededed;
+  border-radius: 10px;
+}

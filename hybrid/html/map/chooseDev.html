@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>问题设备选择</title>
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+		<!-- <script src="./js/jquery-3.5.1.min.js"></script> -->
+		<script src='./js/mapbox-gl.js'></script>
+		<link href='./css/mapbox-gl.css' rel='stylesheet' />
+		<link href='./css/mapCard.css' rel='stylesheet' />
+		<link href='https://at.alicdn.com/t/font_1786484_6l4gpr16qwt.css' rel='stylesheet' />
+		<!-- <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script> -->
+		<!-- 语言 -->
+		<!-- 		<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-language/v0.10.1/mapbox-gl-language.js'></script> -->
+		<script src='./js/mapbox-gl-language.js'></script>
+		<!-- unisdk -->
+		<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js"></script>
+	</head>
+	<body>
+		<div>hello world</div>
+		<button id="test" >test</button>
+		<!-- <div id='map'></div>
+		<div class="cardWrapper" id="showCard"></div> -->
+
+		<script type="text/javascript">
+			//取url中的参数值并拼接地址
+			var url = ''
+
+			//测试代码块开始
+			 
+			var btn = document.getElementById("test");
+			btn.addEventListener('click',function(){
+				console.log("lalala")
+				// uni.showToast({
+				//     title: '标题',
+				//     duration: 2000
+				// });
+			})
+			
+			//测试代码块结束
+
+
+			function getQuery(name) {
+				let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+				let r = window.location.search.substr(1).match(reg);
+				if (r != null) {
+					return decodeURIComponent(r[2])
+				}
+				return null;
+			}
+			// 拿到数据值
+			var equipData = {
+					"type": "FeatureCollection",
+					"features": []
+				},
+				equip,
+				mapObj;
+			// 加载地图
+			var map = "" 
+
+			function showMap(lon, lat) {
+				mapboxgl.accessToken =
+					'pk.eyJ1Ijoic3VueWluZ2p1biIsImEiOiJja2JmNjJwdDcwc2owMnpvaWdhazJyMTAyIn0.P0FMxWjlAf2YJnoXm61lgw';
+				map = new mapboxgl.Map({
+					container: 'map',
+					style: 'mapbox://styles/mapbox/streets-v10',
+					zoom: 14,
+					// center:[119.299968,26.035586],
+					// center: [119.31852, 26.034602],
+					center: [lon, lat],  
+					minZoom: 3
+				});
+				// 语言
+				var language = new MapboxLanguage();
+				map.addControl(language);
+				// 定位
+				var geolocate = new mapboxgl.GeolocateControl({
+					positionOptions: {
+						enableHighAccuracy: true
+					},
+					trackUserLocation: true,
+					showUserLocation: true,
+					showAccuracyCircle: true,
+
+				});
+				map.addControl(geolocate);
+				// 获取位置参数
+				var options = {
+					enableHighAccuracy: true,
+					timeout: 5000,
+					maximumAge: 0
+				};
+				// 获取当前位置成功or失败
+				function success(pos) {
+					let crd = pos.coords;
+					lon = crd.longitude;
+					lat = crd.latitude;
+					// getList(lon,lat)
+				}
+
+				function error(err) {
+					document.addEventListener('UniAppJSBridgeReady', function() {
+						plus.nativeUI.toast("获取定位失败，请打开GPS");
+					})
+					console.warn(`ERROR(${err.code}): ${err.message}`);
+				}
+				navigator.geolocation.getCurrentPosition(success, error, options);
+				return map
+			}
+
+			function getList(lon, lat) {
+				$.ajax({
+					// url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude=26.034602&longitude=119.31852',
+					// url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude='+ lat +'&longitude='+ lon,119.31852, 26.034602
+					url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude=' + lat +
+						'&longitude=' + lon,
+					type: 'GET',
+					async: false,
+					contentType: 'application/json;charset=utf-8',
+					success: function(data) {
+						if (data.length != 0) {
+							equipData.features = data
+							// console.log(JSON.stringify(equipData.features))
+							equipData.features.forEach(item => {
+								var name = "iconSize",
+									value = [30, 35],
+									disName = "distance",
+									iconName = 'icon',
+									icon = 'harbor';
+								item.properties[name] = value
+								item.properties[disName] = ""
+								item.properties[iconName] = icon
+							})
+							// showMap(lon,lat);
+							showPoint(lon, lat, showMap(lon, lat), equipData)
+							// return equipData.features
+						} else {
+							showMap(lon, lat)
+							plus.nativeUI.toast("附近暂无可选设备，问题位置须手动填写")
+							document.getElementById('showCard').style.display = 'none'
+							// return ;
+						}
+					}
+				})
+				// console.log(JSON.stringify(equipData.features))
+			}
+
+			function showPoint(lon, lat, map, equipData) {
+				var currentId,
+					navlon,
+					navlat,
+					address,
+					recbinId,
+					distance;
+				map.on('load', function() {
+					map.addSource('places', {
+						type: 'geojson',
+						data: equipData,
+					});
+					map.addLayer({
+						"id": 'unclustered-point',
+						"type": 'symbol',
+						"source": 'places',
+						'layout': {
+							'icon-image': '{icon}-15',
+							'icon-allow-overlap': true
+						}
+					});
+					// 显示卡片
+					map.on('click', 'unclustered-point', function(e) {
+						for (let i in e.features[0].properties) {
+							if (document.getElementById(i)) {
+								// 计算当前距离
+								if(i == 'deviceId') {
+									let tempId = ''
+									if (currentId) {
+										currentId.style.backgroundImage =
+											"url('./img/unequip.png')";
+									}
+									tempId = document.getElementById(e.features[0].properties[i])
+					
+									tempId.style.backgroundImage =
+										"url('./img/equip.png')";
+									currentId = tempId
+								} else {
+									document.getElementById(i).innerText = e.features[0].properties[i]
+								}
+							}
+							address = e.features[0].properties['address']
+							recbinId = e.features[0].properties['deviceId']
+						}
+						navlon = e.lngLat.lng
+						navlat = e.lngLat.lat		
+					})
+					// 创建列表
+					var list = document.createElement('ul');
+					list.id = 'list';
+					document.getElementById("showCard").appendChild(list);
+					list.id = 'list';
+					equipData.features.forEach((item, index) => {
+						var listItem = document.createElement('li')
+						document.getElementById('list').appendChild(listItem)
+						listItem.id = "listItem" + index
+						// 名称
+						var h4 = document.createElement('h4')
+						document.getElementById('listItem' + index).appendChild(h4)
+						h4.id = "devName" + index
+						h4.innerText = item.properties.deviceName
+						// 地址
+						var p = document.createElement('p')
+						document.getElementById('listItem' + index).appendChild(p)
+						p.id = "address" + index
+						p.innerText = item.properties.address
+						p.style.marginRight = '40px'
+						// jiantou
+						var span = document.createElement('span')
+						document.getElementById('listItem' + index).appendChild(span)
+						span.className = "iconfont iconxuanzhong arrowRight"
+						span.style.visibility = 'hidden';
+						span.id = "arrowRight" + index
+						// 未选中默认为空
+						plus.storage.setItem('address', "")
+						// 点击选中
+						document.getElementById("listItem" + index).addEventListener('click', function(res) {
+							// 选择完成
+							var aaa = document.getElementsByClassName("arrowRight")
+							// console.log(aaa.length)
+							for (let i = 0; i < aaa.length; i++) {
+								document.getElementById("arrowRight" + i).style.visibility = 'hidden'
+								document.getElementById(equipData.features[i].properties.deviceId).style.backgroundImage =
+									"url('./img/unequip.png')";
+							}
+							document.getElementById("arrowRight" + index).style.visibility = 'visible';
+							document.getElementById(item.properties.deviceId).style.backgroundImage = "url('./img/equip.png')";
+							plus.storage.setItem('address', item.properties.address)
+						})
+						var name = "iconSize",
+							value = [30, 35],
+							disName = "distance",
+							iconName = 'icon',
+							icon = 'art-gallery';
+						item.properties[name] = value
+						item.properties[disName] = ""
+						item.properties[iconName] = icon
+					})
+					equipData.features.forEach(function(marker) {
+						// create a DOM element for the marker
+						equip = document.createElement('div');
+						equip.className = 'marker';
+						equip.id = marker.properties.deviceId
+						equip.style.backgroundImage =
+							"url('./img/unequip.png')";
+						equip.style.width = marker.properties.iconSize[0] + 'px';
+						equip.style.height = marker.properties.iconSize[1] + 'px';
+						// add marker to map
+						new mapboxgl.Marker(equip)
+							.setLngLat(marker.geometry.coordinates)
+							.addTo(map);
+					});
+				})
+			}
+			// 获取当前位置
+			function successCB(suc) {
+				nowLon = suc.coords.longitude;
+				nowLat = suc.coords.latitude;
+				// showMap(nowLon,nowLat);
+				getList(nowLon, nowLat);
+				// console.log(nowLon,nowLat)
+			}
+			document.addEventListener('UniAppJSBridgeReady', function() {
+				plus.geolocation.getCurrentPosition(successCB, function(err) {
+					showMap(119.31852, 26.034602)
+					plus.nativeUI.toast("获取定位失败，请打开GPS");
+				}, {
+					provider: 'system',
+					timeout: '10000'
+				})
+			})
+			
+			
+			////////////////////////////////
+			// 	document.addEventListener('UniAppJSBridgeReady', function() {
+			// 		// 获取当前位置
+			// 		plus.geolocation.getCurrentPosition(successCB, function(err){
+			// 			// 119.318528&lat=26.034602:104,
+			// 			showMap(119.31852, 26.034602)
+			// 			// showMap(119.318580, 26.034681)
+			// 			plus.nativeUI.toast("获取定位失败，请打开GPS");
+			// 		},{provider:'system',timeout:'10000'})
+			// 		function successCB(suc){
+			// 			nowLon = suc.coords.longitude;
+			// 			nowLat = suc.coords.latitude;
+			// 			// getList(nowLon,nowLat)
+			// 			// showMap(nowLon,nowLat)
+			// 			// getList(nowLon,nowLat,map)
+			// 		}
+			// 		//取url中的参数值
+			// 		 function getQuery(name) {
+			// 			 // 正则：[找寻'&' + 'url参数名字' = '值' + '&']（'&'可以不存在）
+			// 		     let reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+			// 		     let r = window.location.search.substr(1).match(reg);
+			// 		     if(r != null) {
+			// 		         // 对参数值进行解码
+			// 		         return decodeURIComponent(r[2]);
+			// 		     }
+			// 		     return null;
+			// 		 }
+			// 	// 加载地图
+			// 	// function showMap(lon,lat){
+			// 		mapboxgl.accessToken =
+			// 			'pk.eyJ1Ijoic3VueWluZ2p1biIsImEiOiJja2JmNjJwdDcwc2owMnpvaWdhazJyMTAyIn0.P0FMxWjlAf2YJnoXm61lgw';
+			// 		var map = new mapboxgl.Map({
+			// 			container: 'map',
+			// 			style: 'mapbox://styles/mapbox/streets-v10',
+			// 			zoom: 15,
+			// 			center: [119.31852, 26.034602],
+			// 			// center: [lon,lat],
+			// 			minZoom: 3
+			// 		});
+			// 		// 语言
+			// 		var language = new MapboxLanguage();
+			// 		map.addControl(language);
+			// 		// 定位
+			// 		var geolocate = new mapboxgl.GeolocateControl({
+			// 			positionOptions: {
+			// 				enableHighAccuracy: true
+			// 			},
+			// 			trackUserLocation: true,
+			// 			showUserLocation: true,
+			// 			showAccuracyCircle: true,
+
+			// 		});
+			// 		map.addControl(geolocate);
+			// 		// navigator.geolocation.getCurrentPosition(success, error, options);
+
+
+			// 	// }
+			// 	// 获取设备数据
+			// 	// function getList(lon,lat,map){
+			// 		// console.log(getQuery(lon),getQuery(lat))
+			// 		$.ajax({
+			// 			// url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude=26.034602&longitude=119.31852',
+			// 			url: 'http://39.101.213.6:13018/api/device/browsing/delivery/search/getDeviceNearby?latitude='+ lat +'&longitude='+ lon,
+			// 			type: 'GET',
+			// 			contentType: 'application/json;charset=utf-8',
+			// 			success: function(data) {
+			// 				var equipData = {
+			// 						"type": "FeatureCollection",
+			// 						"features": []
+			// 					},
+			// 					equip,
+			// 					currentId,
+			// 					binId;
+			// 				let nowLon,
+			// 					nowLat;
+
+			// 				if(data.length!=0){
+			// 					equipData.features = data
+			// 				}else{
+			// 					document.getElementById('showCard').style.display='none'
+			// 					plus.nativeUI.toast("附近暂无可选设备，问题位置须手动填写")
+			// 				}
+			// 				// console.log(lon,lat)
+			// 				// mapboxgl.accessToken =
+			// 				// 	'pk.eyJ1Ijoic3VueWluZ2p1biIsImEiOiJja2JmNjJwdDcwc2owMnpvaWdhazJyMTAyIn0.P0FMxWjlAf2YJnoXm61lgw';
+			// 				// var map = new mapboxgl.Map({
+			// 				// 	container: 'map',
+			// 				// 	style: 'mapbox://styles/mapbox/streets-v10',
+			// 				// 	zoom: 15,
+			// 				// 	center: [lon, lat],
+			// 				// 	// center: [119.318580, 26.034681],
+			// 				// 	minZoom: 3,
+			// 				// 	hash:true
+			// 				// });
+			// 				// // 语言
+			// 				// var language = new MapboxLanguage({
+			// 				// 	defaultLanguage: 'zh'
+			// 				// });
+			// 				// map.addControl(language);
+			// 				// // 定位
+			// 				// var geolocate = new mapboxgl.GeolocateControl({
+			// 				// 	positionOptions: {
+			// 				// 		enableHighAccuracy: true
+			// 				// 	},
+			// 				// 	trackUserLocation: true,
+			// 				// 	showUserLocation: true,
+			// 				// 	showAccuracyCircle: true,
+
+			// 				// });
+			// 				// map.addControl(geolocate);
+
+			// 				map.on('load', function() {
+			// 					map.addSource('places', {
+			// 						type: 'geojson',
+			// 						data: equipData,
+			// 					});
+			// 					map.addLayer({
+			// 						"id": 'unclustered-point',
+			// 						"type": 'symbol',
+			// 						"source": 'places',
+			// 						'layout': {
+			// 							'icon-image': '{icon}-15',
+			// 							'icon-allow-overlap': true
+			// 						}
+			// 					});
+			// 					var distance,
+			// 						recbinId,
+			// 						navlon,
+			// 						navlat;
+			// 					// 显示图层
+			// 					map.on('click', 'unclustered-point', function(e) {
+			// 						for (let i in e.features[0].properties) {
+			// 							if (document.getElementById(i)) {
+			// 								// 计算当前距离
+			// 								if(i == 'deviceId') {
+			// 									let tempId = ''
+			// 									if (currentId) {
+			// 										currentId.style.backgroundImage =
+			// 											"url('./img/unequip.png')";
+			// 									}
+			// 									tempId = document.getElementById(e.features[0].properties[i])
+
+			// 									tempId.style.backgroundImage =
+			// 										"url('./img/equip.png')";
+			// 									currentId = tempId
+			// 								} else {
+			// 									document.getElementById(i).innerText = e.features[0].properties[i]
+			// 								}
+			// 							}
+			// 							address = e.features[0].properties['address']
+			// 							recbinId = e.features[0].properties['deviceId']
+			// 						}
+			// 						navlon = e.lngLat.lng
+			// 						navlat = e.lngLat.lat		
+			// 					})
+			// 					equipData.features.forEach(function(marker) {
+			// 						// create a DOM element for the marker
+			// 						equip = document.createElement('div');
+			// 						equip.className = 'marker';
+			// 						equip.id = marker.properties.deviceId
+			// 						equip.style.backgroundImage =
+			// 							"url('./img/unequip.png')";
+			// 						equip.style.width = marker.properties.iconSize[0] + 'px';
+			// 						equip.style.height = marker.properties.iconSize[1] + 'px';
+			// 						// add marker to map
+			// 						new mapboxgl.Marker(equip)
+			// 							.setLngLat(marker.geometry.coordinates)
+			// 							.addTo(map);
+			// 					});
+			// 					// document.getElementById('detail').addEventListener('click', function() {
+			// 					// 	uni.navigateTo({
+			// 					// 		url: '/pages/component/home/recList/recBinDetail?recBinId=' + JSON.stringify(recbinId)+'&dis='+distance,
+			// 					// 	})
+			// 					// })
+			// 					// document.getElementById('navOut').addEventListener('click', function() {
+			// 					// 	openMap(navlat,navlon,address, 'wgs84')
+			// 					// })
+			// 				})
+			// 				// 创建列表
+			// 				var list = document.createElement('ul');
+			// 				list.id = 'list';
+			// 				document.getElementById("showCard").appendChild(list);
+			// 				list.id = 'list';
+			// 				equipData.features.forEach((item,index) => {
+			// 					var listItem = document.createElement('li')
+			// 					document.getElementById('list').appendChild(listItem)
+			// 					listItem.id = "listItem"+index
+			// 					// 名称
+			// 					var h4 = document.createElement('h4')
+			// 					document.getElementById('listItem'+index).appendChild(h4)
+			// 					h4.id = "devName"+index
+			// 					h4.innerText = item.properties.deviceName
+			// 					// 地址
+			// 					var p = document.createElement('p')
+			// 					document.getElementById('listItem'+index).appendChild(p)
+			// 					p.id = "address"+index
+			// 					p.innerText = item.properties.address
+			// 					p.style.marginRight = '40px'
+			// 					// jiantou
+			// 					var span = document.createElement('span')
+			// 					document.getElementById('listItem'+index).appendChild(span)
+			// 					span.className = "iconfont iconxuanzhong arrowRight"
+			// 					span.style.visibility='hidden';
+			// 					span.id = "arrowRight"+index
+			// 					// 未选中默认为空
+			// 					plus.storage.setItem('address',"")
+			// 					// 点击选中
+			// 					document.getElementById("listItem"+index).addEventListener('click',function(res){				
+			// 						// 选择完成
+			// 						var aaa = document.getElementsByClassName("arrowRight")
+			// 						// console.log(aaa.length)
+			// 						for(let i=0;i<aaa.length;i++){
+			// 							document.getElementById("arrowRight"+i).style.visibility='hidden'
+			// 							document.getElementById(equipData.features[i].properties.deviceId).style.backgroundImage ="url('./img/unequip.png')";
+			// 						}
+			// 						document.getElementById("arrowRight"+index).style.visibility='visible';
+			// 						document.getElementById(item.properties.deviceId).style.backgroundImage ="url('./img/equip.png')";
+			// 						plus.storage.setItem('address',item.properties.address)
+			// 					})
+			// 					var name = "iconSize",
+			// 						value = [30, 35],
+			// 						disName = "distance",
+			// 						iconName = 'icon',
+			// 						icon = 'art-gallery';
+			// 					item.properties[name] = value
+			// 					item.properties[disName] = ""
+			// 					item.properties[iconName] = icon
+			// 				})
+			// 			},
+			// 			// error: function() {
+			// 			// 	plus.nativeUI.alert("设备数据获取失败，请重试","我知道了");
+			// 			// }
+			// 		})
+			// 	// }
+			// 	// // 获取当前位置
+			// 	// plus.geolocation.getCurrentPosition(successCB, function(err){
+			// 	// 	plus.nativeUI.toast("获取定位失败，请打开GPS");
+			// 	// })
+			// 	// 获取位置参数
+			// 	// var options = {
+			// 	// 		enableHighAccuracy: true,
+			// 	// 		timeout: 5000,
+			// 	// 		maximumAge: 0
+			// 	// 	},
+			// 	// 	lon,
+			// 	// 	lat,
+			// 	// 	address;
+			// 	// // 获取当前位置成功or失败
+			// 	// function success(pos) {
+			// 	// 	let crd = pos.coords;
+			// 	// 	lon = crd.longitude;
+			// 	// 	lat = crd.latitude;
+			// 	// }
+			// 	// function error(err) {
+			// 	// 	console.warn(`ERROR(${err.code}): ${err.message}`);
+			// 	// }
+			// 	// navigator.geolocation.getCurrentPosition(success, error, options);
+			// 	// document.addEventListener('UniAppJSBridgeReady', function() {
+
+
+			// 	// })
+			// })
+		</script>
+	</body>
+</html>
