@@ -40,7 +40,8 @@
   <div class="login">
     <div class="login-wrap">
       <img class="avatar" src="images/admin_default.jpg">
-      <div id="message" class="alert alert-danger" style="color: green;background-color: aliceblue;border-color: green;display:none">
+      <div id="message" class="alert alert-danger"
+        style="color: green;background-color: aliceblue;border-color: green;display:none">
         <strong id="text"></strong>
       </div>
       <div id="errmessage" class="alert alert-danger" style="display:none">
@@ -49,7 +50,8 @@
       <div id="reg_text">
         <div class="form-group" style="display: flex;">
           <input id="email" name="email" value="" type="email" class="form-control" placeholder="请输入注册邮箱" autofocus>
-          <button id="sendNewEmail" type="button" class="btn btn-primary btn-block" style="margin-left:10px;width:auto" onclick="postmessage()">发送验证码</button>
+          <button id="sendNewEmail" type="button" class="btn btn-primary btn-block" style="margin-left:10px;width:auto"
+            onclick="postmessage()">发送验证码</button>
         </div>
         <div class="form-group">
           <input id="code" name="code" type="code" class="form-control" placeholder="请输入验证码">
@@ -60,7 +62,8 @@
         <div class="form-group">
           <input id="password2" name="password2" type="password" class="form-control" placeholder="再次输入新密码">
         </div>
-        <div class="btn btn-prim ary btn-block" style="background-color:darkgoldenrod;color:white" onclick="resetpw()">提交</div>
+        <div class="btn btn-prim ary btn-block" style="background-color:darkgoldenrod;color:white" onclick="resetpw()">
+          提交</div>
       </div>
       <a style="float:right;margin-top:10px" href="login.html">返回登录</a>
     </div>
@@ -86,7 +89,7 @@
             $this.css("background", "#999999");
             $this.html("重新发送(" + wait + ")");
             wait--;
-            setTimeout(function() {
+            setTimeout(function () {
                 time(o, wait)
               },
               1000)
@@ -97,7 +100,7 @@
           url: 'http://49.234.65.18:2001/admin/sendCode?email=' + document.getElementById("email").value,
           dataType: 'json',
           async: false,
-          success: function(res) {
+          success: function (res) {
             console.log(res)
           }
         });
@@ -117,7 +120,7 @@
         //dataType: 'json', 
         async: false,
         contentType: "application/json;charset=utf-8",
-        success: function(res) {
+        success: function (res) {
           console.log(res)
           if (res.code == 200) {
             document.getElementById("message").style.display = "block"
@@ -131,7 +134,7 @@
           }
 
         },
-        error: function(res) {
+        error: function (res) {
           console.log(res)
         }
       });
