@@ -1,14 +1,13 @@
-﻿<!doctype html>
-<html>
+﻿<html>
 
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport"
 		content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-	<link rel="shortcut icon" href="//www.jieqinwang.com/Public/images/favicon.ico">
-
-	<audio src="music.mp3" autoplay loop></audio>
-	<!-- <script src="http://www.kennethcachia.com/shape-shifter/shape-shifter.js"></script> -->
+	<link rel="shortcut icon" href="favicon.ico">
+	<audio id="audio" autoplay muted>
+		<source src="music.mp3" type="audio/mpeg">
+	</audio>
 	<title>郭艺蕾的专属新年祝福</title>
 
 	<style>
@@ -25,6 +24,7 @@
 </head>
 
 <body>
+	<button style="visibility: hidden;" type="button" id="unmuteButton">Click Me!</button>
 	<canvas id="canvas" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
 	<canvas style="position:absolute;width:100%;height:100%;z-index:9999" class="canvas"></canvas>
 	<div class="overlay">
@@ -39,8 +39,23 @@
 		</div>
 	</div>
 	<script>
-		function initVars() {
+		unmuteButton.addEventListener('click', function () {
+			//alert(1)
+			audio.muted = false;
+		});
+		function it() {
+			document.getElementById("unmuteButton").click()
+		}
 
+		//window.onload = document.getElementById("unmuteButton").click()
+
+		window.onload = setTimeout(it, 1000)
+		/* function it() {
+			audio.muted = false;
+		}
+		window.onload = setTimeout(it, 1000) */
+
+		function initVars() {
 			pi = Math.PI;
 			ctx = canvas.getContext("2d");
 			canvas.width = canvas.clientWidth;
