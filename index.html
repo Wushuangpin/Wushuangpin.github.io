@@ -24,7 +24,6 @@
 </head>
 
 <body>
-	<button style="visibility: hidden;" type="button" id="unmuteButton">Click Me!</button>
 	<canvas id="canvas" style="position:absolute;width:100%;height:100%;z-index:8888"></canvas>
 	<canvas style="position:absolute;width:100%;height:100%;z-index:9999" class="canvas"></canvas>
 	<div class="overlay">
@@ -39,22 +38,6 @@
 		</div>
 	</div>
 	<script>
-		unmuteButton.addEventListener('click', function () {
-			//alert(1)
-			audio.muted = false;
-		});
-		function it() {
-			document.getElementById("unmuteButton").click()
-		}
-
-		//window.onload = document.getElementById("unmuteButton").click()
-
-		window.onload = setTimeout(it, 1000)
-		/* function it() {
-			audio.muted = false;
-		}
-		window.onload = setTimeout(it, 1000) */
-
 		function initVars() {
 			pi = Math.PI;
 			ctx = canvas.getContext("2d");
