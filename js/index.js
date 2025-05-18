@@ -25,7 +25,7 @@ var S = {
     } else {
       //S.UI.simulate('to start|#icon thumbs-up|#countdown 3||');
 
-      S.UI.simulate('|#countdown 5||To邓🐷🐷|愿你|时时刻刻|快乐相伴|分分秒秒|幸福开颜|日日夜夜|好梦常圆|年年岁岁|得偿所愿|朝朝暮暮|希望相随|2025|有你|足矣|#icon heart|');
+      S.UI.simulate('|#countdown 5||To邓🐷🐷|愿你|时时刻刻|快乐相伴|分分秒秒|幸福开颜|日日夜夜|好梦常圆|年年岁岁|得偿所愿|朝朝暮暮|希望相随|2025|有你|足矣|');
     }
 
     S.Drawing.loop(function () {
